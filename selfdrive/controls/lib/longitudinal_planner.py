@@ -85,7 +85,7 @@ class Planner:
 
     global CVS_FRAME
     v_cruise_kph = sm['controlsState'].vCruise
-    if CP.carFingerprint not in TSS2_CAR:
+    if self.CP.carFingerprint not in TSS2_CAR:
       v_cruise_kph = (55 - (55 - (v_cruise_kph+4)) * 2 - 4) if v_cruise_kph < (55 - 4) else v_cruise_kph
       v_cruise_kph = (110 + ((v_cruise_kph+6) - 110) * 3 - 6) if v_cruise_kph > (110 - 6) else v_cruise_kph
       if CVS_FRAME % 5 == 3 and CVS_FRAME < 30:
