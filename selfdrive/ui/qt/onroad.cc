@@ -168,17 +168,26 @@ OnroadHud::OnroadHud(QWidget *parent) : QWidget(parent) {
   connect(this, &OnroadHud::valueChanged, [=] { update(); });
 }
 
+static float vc_speed;
 void OnroadHud::updateState(const UIState &s) {
-  const int SET_SPEED_NA = 255;
+  const int SET_SPEED_NA = 557; //255;
   const SubMaster &sm = *(s.sm);
   const auto cs = sm["controlsState"].getControlsState();
 
   float maxspeed = cs.getVCruise();
+  vc_speed = sm["carState"].getCarState().getVEgo();
+  maxspeed = maxspeed < (55 - 4) ? (55 - (55 - (maxspeed+4)) * 2 - 4) : maxspeed;
+  maxspeed = maxspeed > (110 - 6) ? (110 + ((maxspeed+6) - 110) * 3 - 6) : maxspeed;
   bool cruise_set = maxspeed > 0 && (int)maxspeed != SET_SPEED_NA;
   if (cruise_set && !s.scene.is_metric) {
     maxspeed *= KM_TO_MILE;
   }
   QString maxspeed_str = cruise_set ? QString::number(std::nearbyint(maxspeed)) : "N/A";
+  std::string stdstr_txt = util::read_file("../manager/cruise_info.txt");
+  if(cruise_set && stdstr_txt.empty() == false){
+    QString qstr = QString::fromStdString(stdstr_txt);
+    maxspeed_str = qstr;
+  }
   float cur_speed = std::max(0.0, sm["carState"].getCarState().getVEgo() * (s.scene.is_metric ? MS_TO_KPH : MS_TO_MPH));
 
   setProperty("is_cruise_set", cruise_set);
@@ -195,7 +204,11 @@ void OnroadHud::updateState(const UIState &s) {
   }
 }
 
+static bool global_engageable;
+static int global_status;
+static float curve_value;
 void OnroadHud::paintEvent(QPaintEvent *event) {
+  int y_ofs = 150;
   QPainter p(this);
   p.setRenderHint(QPainter::Antialiasing);
 
@@ -203,34 +216,85 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   QLinearGradient bg(0, header_h - (header_h / 2.5), 0, header_h);
   bg.setColorAt(0, QColor::fromRgbF(0, 0, 0, 0.45));
   bg.setColorAt(1, QColor::fromRgbF(0, 0, 0, 0));
-  p.fillRect(0, 0, width(), header_h, bg);
+  p.fillRect(0, 0, width(), header_h+y_ofs, bg);
 
   // max speed
-  QRect rc(bdr_s * 2, bdr_s * 1.5, 184, 202);
+  float max_disp_k = 1.8;
+  float max_disp_a = 50;
+  QRect rc(bdr_s * 2, bdr_s * 1.5+y_ofs, 184*max_disp_k, 202*max_disp_k);
   p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
   p.setBrush(QColor(0, 0, 0, 100));
   p.drawRoundedRect(rc, 20, 20);
   p.setPen(Qt::NoPen);
 
-  configFont(p, "Open Sans", 48, "Regular");
-  drawText(p, rc.center().x(), 118, "MAX", is_cruise_set ? 200 : 100);
+  configFont(p, "Open Sans", 48*max_disp_k, "Regular");
+  drawText(p, rc.center().x(), 118+y_ofs+max_disp_a, "MAX", is_cruise_set ? 200 : 100);
   if (is_cruise_set) {
-    configFont(p, "Open Sans", 88, is_cruise_set ? "Bold" : "SemiBold");
-    drawText(p, rc.center().x(), 212, maxSpeed, 255);
+    float mm = maxSpeed.length() < 4 ? 1.1 : 1.0;
+    configFont(p, "Open Sans", 88*max_disp_k*mm, is_cruise_set ? "Bold" : "SemiBold");
+    drawText(p, rc.center().x(), 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, maxSpeed, 255);
   } else {
-    configFont(p, "Open Sans", 80, "SemiBold");
-    drawText(p, rc.center().x(), 212, maxSpeed, 100);
+    configFont(p, "Open Sans", 80*max_disp_k*1.1, "SemiBold");
+    drawText(p, rc.center().x(), 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, maxSpeed, 100);
   }
 
   // current speed
   configFont(p, "Open Sans", 176, "Bold");
-  drawText(p, rect().center().x(), 210, speed);
+  drawText(p, rect().center().x(), 210+y_ofs-5, speed);
   configFont(p, "Open Sans", 66, "Regular");
-  drawText(p, rect().center().x(), 290, speedUnit, 200);
+  drawText(p, rect().center().x(), 290+y_ofs-5, speedUnit, 200);
+
+
+//以下オリジナル表示要素
+  configFont(p, "Open Sans", 44, "SemiBold");
+  drawText(p, rect().left()+250, 55, "Powered by COMMA.AI", 150);
+  configFont(p, "Open Sans", 55, "SemiBold");
+  drawText(p, rect().right()-260, 60, "for prius PHV TSSP", 150);
+  configFont(p, "Open Sans", 33, "SemiBold");
+  drawText(p, rect().right()-275, rect().bottom() - 10 , "modified by PROGRAMAN ICHIRO", 150);
+  configFont(p, "Open Sans", 33, "Bold");
+  float angle_steer = 0;
+  float a0 = 150,a1 = 150,a2 = 150,a3 = 150;
+  curve_value = 0;
+  global_status = status;
+  global_engageable = engageable;
+  if (engageable && status != STATUS_ENGAGED) {
+    a0 = 50; a1 = 50; a2 = 50; a3 = 50;
+  } else if (engageable && status == STATUS_ENGAGED) {
+    a0 = 50; a1 = 50; a2 = 50; a3 = 50;
+    if(vc_speed < 1/3.6){
+      a3 = 200;
+    }
+    std::string angle_steer_txt = util::read_file("../manager/steer_ang_info.txt");
+    if(angle_steer_txt.empty() == false){
+      angle_steer = std::stof(angle_steer_txt);
+    }
+    if(vc_speed >= 1/3.6 && (angle_steer > 1.5 || angle_steer < -1.5)){ //低速では1.0だが、一緒くたにする
+      a2 = 200;
+    }
+    if ( maxSpeed.contains(".", Qt::CaseInsensitive) == true ) {
+      a1 = 200;
+    }
+    if (is_cruise_set){
+      float acc_speed = maxSpeed.toFloat();
+      if(acc_speed > 0 && (acc_speed < 31.0 ||  acc_speed > 119.0) ) {
+        a0 = 200;
+      }
+    }
+    std::string limit_vc_txt = util::read_file("../manager/limit_vc_info.txt");
+    if(limit_vc_txt.empty() == false && vc_speed >= 1/3.6){
+      curve_value = std::stof(limit_vc_txt);
+    }
+  }
+  drawText(p, rect().center().x(), 50 + 40*0 , "extra cruise speed engagement", a0);
+  drawText(p, rect().center().x(), 50 + 40*1 , "slow down corner correctly", a1);
+  drawText(p, rect().center().x(), 50 + 40*2 , "make curve inner offset", a2);
+  //drawText(p, rect().center().x(), 50 + 40*2 , QString::number(angle_steer), a2);
+  drawText(p, rect().center().x(), 50 + 40*3 , "auto brake holding", a3);
 
   // engage-ability icon
   if (engageable) {
-    drawIcon(p, rect().right() - radius / 2 - bdr_s * 2, radius / 2 + int(bdr_s * 1.5),
+    drawIcon(p, rect().right() - radius / 2 - bdr_s * 2, radius / 2 + int(bdr_s * 1.5)+y_ofs,
              engage_img, bg_colors[status], 1.0);
   }
 
@@ -311,6 +375,69 @@ void NvgWindow::drawLaneLines(QPainter &painter, const UIScene &scene) {
   bg.setColorAt(1, scene.end_to_end ? redColor(0) : QColor(255, 255, 255, 0));
   painter.setBrush(bg);
   painter.drawPolygon(scene.track_vertices.v, scene.track_vertices.cnt);
+
+  knightScanner(painter);
+}
+
+void NvgWindow::knightScanner(QPainter &p) {
+
+  static const int ct_n = 1;
+  static float ct;
+
+  int rect_w = rect().width();
+  int rect_h = rect().height();
+
+  const int n = 15;
+  static float t[n];
+  //int dim_n = (sin(ct/5) + 1) * (n-0.01);
+  //t[dim_n] = 1.0;
+  t[(int)(ct/ct_n)] = 1.0;
+  int ww = rect_w / n;
+  int hh = ww;
+
+  static float dir0 = 1.0;
+  float dir;
+  if(curve_value == 0){
+    dir = dir0 * 0.25;
+    hh = hh / 3;
+  } else if(curve_value < 145){
+    dir = dir0 * 1.0;
+  } else {
+    dir = dir0 * 0.5;
+    hh = hh * 2 / 3;
+  }
+
+  //int h_pos = 0;
+  int h_pos = rect_h - hh;
+
+  //ct ++;
+  //ct %= n * ct_n;
+  ct += dir;
+  if(ct <= 0 || ct >= n*ct_n-1){
+    if(ct < 0 && dir < 0)ct = 0;
+    if(ct > n*ct_n-1 && dir > 0)ct = n*ct_n-1;
+    dir0 = -dir0;
+    if(vc_speed >= 1/3.6 && global_engageable && global_status == STATUS_ENGAGED) {
+      std::string limit_vc_txt = util::read_file("../manager/limit_vc_info.txt");
+      if(limit_vc_txt.empty() == false){
+        float cv = std::stof(limit_vc_txt);
+        if(cv > 0){
+          curve_value = cv;
+        }
+      }
+    }
+  }
+  p.setCompositionMode(QPainter::CompositionMode_Plus);
+  for(int i=0; i<n; i++){
+    //QRect rc(0, h_pos, ww, hh);
+    if(t[i] > 0.01){
+      //p.drawRoundedRect(rc, 0, 0);
+      p.setBrush(QColor(200, 0, 0, 255 * t[i]));
+      p.drawRect(rect_w * i / n, h_pos, ww, hh);
+    }
+    t[i] *= 0.9;
+  }
+  p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 }
 
 void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd) {
