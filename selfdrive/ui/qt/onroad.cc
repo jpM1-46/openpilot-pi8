@@ -179,7 +179,7 @@ void OnroadHud::updateState(const UIState &s) {
   std::string tss_type_txt = util::read_file("../manager/tss_type_info.txt");
   bool tss2 = false;
   if(tss_type_txt.empty() == false){
-    if ( tss_type_txt.compare("2", Qt::CaseSensitive) == 0 ) {
+    if ( tss_type_txt == "2" ) {
       //TSS2
       tss2 = true;
     }
