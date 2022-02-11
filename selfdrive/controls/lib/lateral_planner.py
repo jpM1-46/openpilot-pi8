@@ -5,7 +5,7 @@ from common.numpy_fast import interp
 from selfdrive.swaglog import cloudlog
 from selfdrive.controls.lib.lateral_mpc_lib.lat_mpc import LateralMpc
 from selfdrive.controls.lib.drive_helpers import CONTROL_N, MPC_COST_LAT, LAT_MPC_N, CAR_ROTATION_RADIUS
-from selfdrive.controls.lib.lane_planner import LanePlanner, TRAJECTORY_SIZE
+from selfdrive.controls.lib.lane_planner import LanePlanner, TRAJECTORY_SIZE , STEERING_CENTER
 from selfdrive.config import Conversions as CV
 import cereal.messaging as messaging
 from cereal import log
@@ -81,6 +81,63 @@ class LateralPlanner:
       self.plan_yaw = list(md.orientation.z)
     if len(md.position.xStd) == TRAJECTORY_SIZE:
       self.path_xyz_stds = np.column_stack([md.position.xStd, md.position.yStd, md.position.zStd])
+
+    STEER_CTRL_Y = sm['carState'].steeringAngleDeg
+    path_y = self.path_xyz[:,1]
+    max_yp = 0
+    for yp in path_y:
+      max_yp = yp if abs(yp) > abs(max_yp) else max_yp
+    #with open('./debug_out_y','w') as fp:
+    #  path_y_sum = -sum(path_y)
+    #  #fp.write('{0}\n'.format(['%0.2f' % i for i in self.path_xyz[:,1]]))
+    #  fp.write('max:%0.2f ; sum:%0.2f ; avg:%0.2f' % (-max_yp , path_y_sum, path_y_sum / len(path_y)) )
+    handle_center = STEERING_CENTER
+    ypf = STEER_CTRL_Y - handle_center
+    if abs(STEER_CTRL_Y - handle_center) < abs(max_yp) / 2.5:
+      STEER_CTRL_Y = (-max_yp / 2.5) + handle_center
+
+    if False:
+      ssa = ""
+      ssao = ""
+      ssas = ""
+      if ypf > 0:
+        for vml in range(int(min(ypf,30))):
+          ssa+= "|"
+      if ypf > 0 and int(min(STEER_CTRL_Y - (handle_center) - ypf,30 - len(ssa))) > 0:
+        for vml in range(int(min(STEER_CTRL_Y - (handle_center) - ypf,30 - len(ssa)))):
+          ssao+= "<"
+      elif ypf < 0 and (STEER_CTRL_Y - handle_center) > 0 and int(min((STEER_CTRL_Y - (handle_center)),30 - len(ssa))) > 0:
+        for vml in range(int(min((STEER_CTRL_Y - (handle_center)),30 - len(ssa)))):
+          ssao+= "<"
+      if 30 - len(ssa) - len(ssao) > 0:
+        for vml in range(int(30 - len(ssa) - len(ssao))):
+          ssas+= " "
+      mssa = ""
+      mssao = ""
+      mssas = ""
+      if ypf < 0:
+        for vml in range(int(min(-ypf,30))):
+          mssa+= "|"
+      if ypf < 0 and int(min(-(STEER_CTRL_Y - (handle_center) - ypf),30 - len(mssa))) > 0:
+        for vml in range(int(min(-(STEER_CTRL_Y - (handle_center) - ypf),30 - len(mssa)))):
+          mssao+= ">"
+      elif ypf > 0 and (STEER_CTRL_Y - handle_center) < 0 and int(min(-(STEER_CTRL_Y - (handle_center)),30 - len(mssa))) > 0:
+        for vml in range(int(min(-(STEER_CTRL_Y - (handle_center)),30 - len(mssa)))):
+          mssao+= ">"
+      if 30 - len(mssa) - len(mssao) > 0:
+        for vml in range(int(30 - len(mssa) - len(mssao))):
+          mssas+= " "
+      with open('./debug_out_1','w') as fp:
+        #fp.write('strAng:%0.1f->%0.1f[deg] , speed:%0.1f[km/h]' % (ypf , STEER_CTRL_Y - (handle_center) - ypf, v_ego * 3.6))
+        #fp.write('steerAngY:%0.1f[deg] , speed:%0.1f[km/h]' % (STEER_CTRL_Y - handle_center, v_ego * 3.6))
+        #fp.write('steerAng:%0.1f[deg] , speed:%0.1f[km/h]' % (STEER_CTRL_Y , v_ego * 3.6))
+        fp.write('strAng:%5.1f(%+5.1f[deg])%s%s%s^%s%s%s' % (ypf , STEER_CTRL_Y - (handle_center) - ypf, ssas,ssao,ssa,mssa,mssao,mssas))
+      
+
+    if sm['carState'].leftBlinker == True:
+      STEER_CTRL_Y = 90
+    if sm['carState'].rightBlinker == True:
+      STEER_CTRL_Y = -90
 
     # Lane change logic
     one_blinker = sm['carState'].leftBlinker != sm['carState'].rightBlinker
@@ -162,10 +219,13 @@ class LateralPlanner:
       self.LP.lll_prob *= self.lane_change_ll_prob
       self.LP.rll_prob *= self.lane_change_ll_prob
     if self.use_lanelines:
-      d_path_xyz = self.LP.get_d_path(v_ego, self.t_idxs, self.path_xyz)
+      #d_path_xyz = self.LP.get_d_path(v_ego, self.t_idxs, self.path_xyz)
+      d_path_xyz = self.LP.get_d_path(STEER_CTRL_Y , v_ego, self.t_idxs, self.path_xyz)
       self.lat_mpc.set_weights(MPC_COST_LAT.PATH, MPC_COST_LAT.HEADING, self.steer_rate_cost)
     else:
       d_path_xyz = self.path_xyz
+      dcm = self.LP.calc_dcm(STEER_CTRL_Y, v_ego,2.5,-1,-1) #2.5はレーンを消すダミー,-1,-1はカメラオフセット反映に必要
+      d_path_xyz[:,1] -= dcm #CAMERA_OFFSETが反映されている。->実はcalc_dcmの中で無視している。無い方が走りが良い？
       path_cost = np.clip(abs(self.path_xyz[0, 1] / self.path_xyz_stds[0, 1]), 0.5, 1.5) * MPC_COST_LAT.PATH
       # Heading cost is useful at low speed, otherwise end of plan can be off-heading
       heading_cost = interp(v_ego, [5.0, 10.0], [MPC_COST_LAT.HEADING, 0.0])

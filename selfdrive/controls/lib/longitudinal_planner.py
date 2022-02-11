@@ -13,6 +13,28 @@ from selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import T_IDXS as T_IDX
 from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX, CONTROL_N
 from selfdrive.swaglog import cloudlog
 
+from selfdrive.controls.lib.lane_planner import LanePlanner, TRAJECTORY_SIZE , STEERING_CENTER
+from common.params import Params
+PARAMS = Params()
+CVS_FRAME = 0
+
+def calc_limit_vc(X1,X2,X3 , Y1,Y2,Y3):
+  Z1 = (X2-X1)/(Y1-Y2) - (X3-X2)/(Y2-Y3)
+  Z2 = (X3-X2)/(Y2-Y3) - (X1-X3)/(Y3-Y1)
+  A = (X2-X1)*(X1*X2 - X2*X3) - (X1-X3)*(X2*X3 - X3*X1)
+  A /= Z1*(X2-X1) - Z2*(X1-X3)
+  B = ((X1*X2 - X2*X3) - A*Z1) / (X1-X3)
+  C = Y1 - A / (X1 - B)
+  return (A,B,C)
+
+LIMIT_VC_A ,LIMIT_VC_B ,LIMIT_VC_C  = calc_limit_vc(8.7,11.6,27.0 , 86-4      ,60-4      ,47-4      )
+#LIMIT_VC_AH,LIMIT_VC_BH,LIMIT_VC_CH = calc_limit_vc(8.7,11.6,23.0 , 96-4+3+1+4,72-4+4+3+3,60-4+5+6+2)
+LIMIT_VC_AH,LIMIT_VC_BH,LIMIT_VC_CH = calc_limit_vc(8.7,13.0,25.0 , 112,93,81)
+
+OP_ENABLE_PREV = False
+OP_ENABLE_v_cruise_kph = 0
+OP_ENABLE_gas_speed = 0
+
 LON_MPC_STEP = 0.2  # first step is 0.2s
 AWARENESS_DECEL = -0.2  # car smoothly decel at .2m/s^2 when user is distracted
 A_CRUISE_MIN = -1.2
@@ -61,6 +83,76 @@ class Planner:
     a_ego = sm['carState'].aEgo
 
     v_cruise_kph = sm['controlsState'].vCruise
+    v_cruise_kph = (55 - (55 - (v_cruise_kph+4)) * 2 - 4) if v_cruise_kph < (55 - 4) else v_cruise_kph
+    v_cruise_kph = (110 + ((v_cruise_kph+6) - 110) * 3 - 6) if v_cruise_kph > (110 - 6) else v_cruise_kph
+    global OP_ENABLE_PREV
+    global OP_ENABLE_v_cruise_kph
+    global OP_ENABLE_gas_speed
+    #if OP_ENABLE_PREV == False and sm['controlsState'].longControlState != LongCtrlState.off and v_ego > 3/3.6: # and sm['carState'].gasPressed:
+       #速度が時速３km以上なら、無条件にエクストラエンゲージするテスト 
+    if OP_ENABLE_PREV == False and sm['controlsState'].longControlState != LongCtrlState.off and sm['carState'].gasPressed:
+      #アクセル踏みながらのOP有効化の瞬間
+      OP_ENABLE_v_cruise_kph = v_cruise_kph
+      OP_ENABLE_gas_speed = v_ego
+    if sm['controlsState'].longControlState != LongCtrlState.off:
+      OP_ENABLE_PREV = True
+      if sm['carState'].gasPressed:
+        OP_ENABLE_gas_speed = v_ego
+    else:
+      OP_ENABLE_PREV = False
+      OP_ENABLE_v_cruise_kph = 0
+    if OP_ENABLE_v_cruise_kph != v_cruise_kph: #レバー操作したらエンゲージ初期クルーズ速度解除
+      OP_ENABLE_v_cruise_kph = 0
+    if OP_ENABLE_v_cruise_kph != 0:
+      v_cruise_kph = OP_ENABLE_gas_speed*3.6 #エンゲージ初期クルーズ速度を優先して使う
+    handle_center = STEERING_CENTER
+    steerAng = sm['carState'].steeringAngleDeg - handle_center
+    orgSteerAng = steerAng
+    limit_vc = V_CRUISE_MAX
+    limit_vc_h = V_CRUISE_MAX
+    md = sm['modelV2']
+    global CVS_FRAME
+    ml_csv = ""
+    if len(md.position.x) == TRAJECTORY_SIZE and len(md.orientation.x) == TRAJECTORY_SIZE and PARAMS.get_bool("IsMetric"):
+      path_xyz = np.column_stack([md.position.x, md.position.y, md.position.z])
+      path_y = path_xyz[:,1]
+      max_yp = 0
+      for yp in path_y:
+        max_yp = yp if abs(yp) > abs(max_yp) else max_yp
+        if abs(steerAng) < abs(max_yp) / 2.5:
+          steerAng = (-max_yp / 2.5)
+      limit_vc = V_CRUISE_MAX if abs(steerAng) <= LIMIT_VC_B else LIMIT_VC_A / (abs(steerAng) - LIMIT_VC_B) + LIMIT_VC_C
+      limit_vc_h = V_CRUISE_MAX if abs(steerAng) <= LIMIT_VC_BH else LIMIT_VC_AH / (abs(steerAng) - LIMIT_VC_BH) + LIMIT_VC_CH
+      if CVS_FRAME % 10 == 0 and v_ego * 3.6 > 20: # over 20km/h
+        ml_csv = '%0.2f,' % v_cruise_kph
+        for i in path_y:
+          ml_csv += '%0.2f,' % i
+    v_cruise_kph_org = v_cruise_kph
+    limit_vc_th = #95-5 #85-5 #80-4
+    limit_vc_tl = 65-4 #70-4
+    if v_cruise_kph_org > limit_vc_th:
+      limit_vc = limit_vc_h
+    elif v_cruise_kph_org >= limit_vc_tl:
+      limit_vc = (limit_vc * ((limit_vc_th)-v_cruise_kph_org) + limit_vc_h * (v_cruise_kph_org - (limit_vc_tl))) / (limit_vc_th - limit_vc_tl)
+    v_cruise_kph = limit_vc if limit_vc < v_cruise_kph else v_cruise_kph
+    if CVS_FRAME % 5 == 2:
+      with open('./limit_vc_info.txt','w') as fp:
+        fp.write('%d' % (limit_vc))
+    if CVS_FRAME % 5 == 1:
+      with open('./steer_ang_info.txt','w') as fp:
+        fp.write('%f' % (steerAng))
+    if CVS_FRAME % 5 == 0:
+      with open('./cruise_info.txt','w') as fp:
+        #fp.write('%d/%d' % (v_cruise_kph_org , (limit_vc if limit_vc < V_CRUISE_MAX else V_CRUISE_MAX)))
+        if v_cruise_kph == limit_vc:
+          fp.write('%d.' % (v_cruise_kph))
+        else:
+          fp.write('%d' % (v_cruise_kph_org))
+    #if CVS_FRAME % 10 == 0 and limit_vc < V_CRUISE_MAX and v_ego * 3.6 > 20: # over 20km/h
+    #  with open('./ml_data.csv','a') as fp:
+    #    fp.write('%s%0.2f\n' % (ml_csv , limit_vc))
+    CVS_FRAME += 1
+
     v_cruise_kph = min(v_cruise_kph, V_CRUISE_MAX)
     v_cruise = v_cruise_kph * CV.KPH_TO_MS
 
@@ -78,8 +170,43 @@ class Planner:
     self.v_desired = self.alpha * self.v_desired + (1 - self.alpha) * v_ego
     self.v_desired = max(0.0, self.v_desired)
 
+    if False:
+      msv_desired = max(0,self.v_desired * 3.6)
+      msc = "A:%5.1fkm/h" % (v_cruise_kph_org)
+      if int(min(v_cruise_kph_org,V_CRUISE_MAX) / 2) - len(msc) > 0:
+        for vm in range(int(min(v_cruise_kph_org,V_CRUISE_MAX) / 2) - len(msc)):
+          msc += "#"
+      msl = "L:%5.1fkm/h" % (limit_vc)
+      if int(min(limit_vc,V_CRUISE_MAX) / 2) - len(msl) > 0:
+        for vml in range(int(min(limit_vc,V_CRUISE_MAX) / 2) - len(msl)):
+          msl += "<"
+      v_ego_2 = max(0,v_ego * 3.6)
+      msv = "V:%5.1fkm/h" % (v_ego_2)
+      if msv_desired <= v_ego_2:
+        if int(min(msv_desired,V_CRUISE_MAX) / 2) - len(msv) > 0:
+          for vml in range(int(min(msv_desired,V_CRUISE_MAX) / 2) - len(msv)):
+            msv += "|"
+        if int(min(v_ego_2,V_CRUISE_MAX) / 2) - len(msv) > 0:
+          for vml in range(int(min(v_ego_2,V_CRUISE_MAX) / 2) - len(msv)):
+            msv += "<"
+      else:
+        if int(min(v_ego_2,V_CRUISE_MAX) / 2) - len(msv) > 0:
+          for vml in range(int(min(v_ego_2,V_CRUISE_MAX) / 2) - len(msv)):
+            msv += "|"
+        if int(min(msv_desired,V_CRUISE_MAX) / 2) - len(msv) > 0:
+          for vml in range(int(min(msv_desired,V_CRUISE_MAX) / 2) - len(msv)):
+            msv += ">"
+      msv += "%+.1fkm/h" % (msv_desired-v_ego_2)
+      with open('./debug_out_v','w') as fp:
+        #fp.write('[%i],vc:%.1f(%.1f) , v:%.2f , vd:%.2f[km/h] ; ah:%.2f bh:%.2f ch:%.2f' % (prev_accel_constraint , v_cruise_kph_org , limit_vc , v_ego * 3.6 , self.v_desired* 3.6 , LIMIT_VC_AH,LIMIT_VC_BH,LIMIT_VC_CH) )
+        #fp.write('[%i],vc:%.1f(%.1f) , v:%.2f , vd:%.2f[km/h] ; a:%.2f , ad:%.2f[m/ss]' % (prev_accel_constraint , v_cruise_kph , limit_vc , v_ego * 3.6 , self.v_desired* 3.6 , a_ego , self.a_desired) )
+        fp.write('ah:%.2f bh:%.2f ch:%.2f\n' % (LIMIT_VC_AH,LIMIT_VC_BH,LIMIT_VC_CH) )
+        #fp.write('op:[%d] vk:%.2f gs:%.2fkm/h\n' % (OP_ENABLE_PREV,OP_ENABLE_v_cruise_kph,OP_ENABLE_gas_speed*3.6) )
+        fp.write("%s\n%s\n%s" % (msc ,msl ,msv))
+
     accel_limits = [A_CRUISE_MIN, get_max_accel(v_ego)]
-    accel_limits_turns = limit_accel_in_turns(v_ego, sm['carState'].steeringAngleDeg, accel_limits, self.CP)
+    #accel_limits_turns = limit_accel_in_turns(v_ego, sm['carState'].steeringAngleDeg, accel_limits, self.CP)
+    accel_limits_turns = limit_accel_in_turns(v_ego, orgSteerAng, accel_limits, self.CP)
     if force_slow_decel:
       # if required so, force a smooth deceleration
       accel_limits_turns[1] = min(accel_limits_turns[1], AWARENESS_DECEL)
