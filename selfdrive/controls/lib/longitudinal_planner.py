@@ -128,7 +128,7 @@ class Planner:
         for i in path_y:
           ml_csv += '%0.2f,' % i
     v_cruise_kph_org = v_cruise_kph
-    limit_vc_th = #95-5 #85-5 #80-4
+    limit_vc_th = 95-5 #85-5 #80-4
     limit_vc_tl = 65-4 #70-4
     if v_cruise_kph_org > limit_vc_th:
       limit_vc = limit_vc_h
