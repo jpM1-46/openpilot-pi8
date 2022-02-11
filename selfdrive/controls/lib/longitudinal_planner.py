@@ -83,6 +83,7 @@ class Planner:
     v_ego = sm['carState'].vEgo
     a_ego = sm['carState'].aEgo
 
+    global CVS_FRAME
     v_cruise_kph = sm['controlsState'].vCruise
     if CP.carFingerprint not in TSS2_CAR:
       v_cruise_kph = (55 - (55 - (v_cruise_kph+4)) * 2 - 4) if v_cruise_kph < (55 - 4) else v_cruise_kph
@@ -120,7 +121,6 @@ class Planner:
     limit_vc = V_CRUISE_MAX
     limit_vc_h = V_CRUISE_MAX
     md = sm['modelV2']
-    global CVS_FRAME
     ml_csv = ""
     if len(md.position.x) == TRAJECTORY_SIZE and len(md.orientation.x) == TRAJECTORY_SIZE and PARAMS.get_bool("IsMetric"):
       path_xyz = np.column_stack([md.position.x, md.position.y, md.position.z])
