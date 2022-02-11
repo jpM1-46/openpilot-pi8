@@ -177,12 +177,17 @@ void OnroadHud::updateState(const UIState &s) {
   float maxspeed = cs.getVCruise();
   vc_speed = sm["carState"].getCarState().getVEgo();
   std::string tss_type_txt = util::read_file("../manager/tss_type_info.txt");
+  bool tss2 = false;
   if(tss_type_txt.empty() == false){
-    if ( tss_type_txt.compare("1", Qt::CaseSensitive) == 0 ) {
-     	//TSSP
-      maxspeed = maxspeed < (55 - 4) ? (55 - (55 - (maxspeed+4)) * 2 - 4) : maxspeed;
-      maxspeed = maxspeed > (110 - 6) ? (110 + ((maxspeed+6) - 110) * 3 - 6) : maxspeed;
+    if ( tss_type_txt.compare("2", Qt::CaseSensitive) == 0 ) {
+      //TSS2
+      tss2 = true;
     }
+  }
+  if(tss2 == false){
+    //これまでと互換。tss_type_infoがなければTSSP
+    maxspeed = maxspeed < (55 - 4) ? (55 - (55 - (maxspeed+4)) * 2 - 4) : maxspeed;
+    maxspeed = maxspeed > (110 - 6) ? (110 + ((maxspeed+6) - 110) * 3 - 6) : maxspeed;
   }
   bool cruise_set = maxspeed > 0 && (int)maxspeed != SET_SPEED_NA;
   if (cruise_set && !s.scene.is_metric) {
