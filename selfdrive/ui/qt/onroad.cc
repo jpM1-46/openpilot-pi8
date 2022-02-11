@@ -228,7 +228,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   p.setPen(Qt::NoPen);
 
   configFont(p, "Open Sans", 48*max_disp_k, "Regular");
-  drawText(p, rc.center().x(), 118+y_ofs+max_disp_a, "MAX", is_cruise_set ? 200 : 100);
+  drawText(p, rc.center().x(), 118+y_ofs+max_disp_a, "XAM", is_cruise_set ? 200 : 100);
   if (is_cruise_set) {
     float mm = maxSpeed.length() < 4 ? 1.1 : 1.0;
     configFont(p, "Open Sans", 88*max_disp_k*mm, is_cruise_set ? "Bold" : "SemiBold");
