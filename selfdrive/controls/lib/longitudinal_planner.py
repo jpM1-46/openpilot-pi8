@@ -13,6 +13,7 @@ from selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import T_IDXS as T_IDX
 from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX, CONTROL_N
 from selfdrive.swaglog import cloudlog
 
+from selfdrive.car.toyota.values import TSS2_CAR
 from selfdrive.controls.lib.lane_planner import LanePlanner, TRAJECTORY_SIZE , STEERING_CENTER
 from common.params import Params
 PARAMS = Params()
@@ -83,8 +84,16 @@ class Planner:
     a_ego = sm['carState'].aEgo
 
     v_cruise_kph = sm['controlsState'].vCruise
-    v_cruise_kph = (55 - (55 - (v_cruise_kph+4)) * 2 - 4) if v_cruise_kph < (55 - 4) else v_cruise_kph
-    v_cruise_kph = (110 + ((v_cruise_kph+6) - 110) * 3 - 6) if v_cruise_kph > (110 - 6) else v_cruise_kph
+    if CP.carFingerprint not in TSS2_CAR:
+      v_cruise_kph = (55 - (55 - (v_cruise_kph+4)) * 2 - 4) if v_cruise_kph < (55 - 4) else v_cruise_kph
+      v_cruise_kph = (110 + ((v_cruise_kph+6) - 110) * 3 - 6) if v_cruise_kph > (110 - 6) else v_cruise_kph
+      if CVS_FRAME % 5 == 3 and CVS_FRAME < 30:
+        with open('./tss_type_info.txt','w') as fp:
+          fp.write('%d' % (1))
+    else:
+      if CVS_FRAME % 5 == 3 and CVS_FRAME < 30:
+        with open('./tss_type_info.txt','w') as fp:
+          fp.write('%d' % (2))
     global OP_ENABLE_PREV
     global OP_ENABLE_v_cruise_kph
     global OP_ENABLE_gas_speed

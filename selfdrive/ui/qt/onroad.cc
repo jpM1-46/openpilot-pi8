@@ -176,8 +176,14 @@ void OnroadHud::updateState(const UIState &s) {
 
   float maxspeed = cs.getVCruise();
   vc_speed = sm["carState"].getCarState().getVEgo();
-  maxspeed = maxspeed < (55 - 4) ? (55 - (55 - (maxspeed+4)) * 2 - 4) : maxspeed;
-  maxspeed = maxspeed > (110 - 6) ? (110 + ((maxspeed+6) - 110) * 3 - 6) : maxspeed;
+  std::string tss_type_txt = util::read_file("../manager/tss_type_info.txt");
+  if(tss_type_txt.empty() == false){
+    if ( tss_type_txt.compare("1", Qt::CaseSensitive) == 0 ) {
+     	//TSSP
+      maxspeed = maxspeed < (55 - 4) ? (55 - (55 - (maxspeed+4)) * 2 - 4) : maxspeed;
+      maxspeed = maxspeed > (110 - 6) ? (110 + ((maxspeed+6) - 110) * 3 - 6) : maxspeed;
+    }
+  }
   bool cruise_set = maxspeed > 0 && (int)maxspeed != SET_SPEED_NA;
   if (cruise_set && !s.scene.is_metric) {
     maxspeed *= KM_TO_MILE;
