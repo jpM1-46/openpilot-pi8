@@ -98,17 +98,19 @@ class LateralPlanner:
       value_STEERING_CENTER_calibration = sum(STEERING_CENTER_calibration) / len(STEERING_CENTER_calibration)
     else:
       value_STEERING_CENTER_calibration = 0
+    handle_center = STEERING_CENTER
     if len(STEERING_CENTER_calibration) > STEERING_CENTER_calibration_max:
+      handle_center = value_STEERING_CENTER_calibration #動的に求めたハンドルセンターを使う。
       with open('./handle_center_info.txt','w') as fp:
         fp.write('%0.2f' % (value_STEERING_CENTER_calibration) )
     with open('./debug_out_y','w') as fp:
       path_y_sum = -sum(path_y)
     #  #fp.write('{0}\n'.format(['%0.2f' % i for i in self.path_xyz[:,1]]))
       fp.write('calibration:%0.2f/%d ; max:%0.2f ; sum:%0.2f ; avg:%0.2f' % (value_STEERING_CENTER_calibration,len(STEERING_CENTER_calibration),-max_yp , path_y_sum, path_y_sum / len(path_y)) )
-    handle_center = STEERING_CENTER
-    ypf = STEER_CTRL_Y - handle_center
-    if abs(STEER_CTRL_Y - handle_center) < abs(max_yp) / 2.5:
-      STEER_CTRL_Y = (-max_yp / 2.5) + handle_center
+    STEER_CTRL_Y -= handle_center #STEER_CTRL_Yにhandle_centerを込みにする。
+    ypf = STEER_CTRL_Y
+    if abs(STEER_CTRL_Y) < abs(max_yp) / 2.5:
+      STEER_CTRL_Y = (-max_yp / 2.5)
 
     if False:
       ssa = ""
@@ -117,11 +119,11 @@ class LateralPlanner:
       if ypf > 0:
         for vml in range(int(min(ypf,30))):
           ssa+= "|"
-      if ypf > 0 and int(min(STEER_CTRL_Y - (handle_center) - ypf,30 - len(ssa))) > 0:
-        for vml in range(int(min(STEER_CTRL_Y - (handle_center) - ypf,30 - len(ssa)))):
+      if ypf > 0 and int(min(STEER_CTRL_Y - ypf,30 - len(ssa))) > 0:
+        for vml in range(int(min(STEER_CTRL_Y - ypf,30 - len(ssa)))):
           ssao+= "<"
-      elif ypf < 0 and (STEER_CTRL_Y - handle_center) > 0 and int(min((STEER_CTRL_Y - (handle_center)),30 - len(ssa))) > 0:
-        for vml in range(int(min((STEER_CTRL_Y - (handle_center)),30 - len(ssa)))):
+      elif ypf < 0 and (STEER_CTRL_Y) > 0 and int(min((STEER_CTRL_Y),30 - len(ssa))) > 0:
+        for vml in range(int(min((STEER_CTRL_Y),30 - len(ssa)))):
           ssao+= "<"
       if 30 - len(ssa) - len(ssao) > 0:
         for vml in range(int(30 - len(ssa) - len(ssao))):
@@ -132,20 +134,20 @@ class LateralPlanner:
       if ypf < 0:
         for vml in range(int(min(-ypf,30))):
           mssa+= "|"
-      if ypf < 0 and int(min(-(STEER_CTRL_Y - (handle_center) - ypf),30 - len(mssa))) > 0:
-        for vml in range(int(min(-(STEER_CTRL_Y - (handle_center) - ypf),30 - len(mssa)))):
+      if ypf < 0 and int(min(-(STEER_CTRL_Y - ypf),30 - len(mssa))) > 0:
+        for vml in range(int(min(-(STEER_CTRL_Y - ypf),30 - len(mssa)))):
           mssao+= ">"
-      elif ypf > 0 and (STEER_CTRL_Y - handle_center) < 0 and int(min(-(STEER_CTRL_Y - (handle_center)),30 - len(mssa))) > 0:
-        for vml in range(int(min(-(STEER_CTRL_Y - (handle_center)),30 - len(mssa)))):
+      elif ypf > 0 and (STEER_CTRL_Y) < 0 and int(min(-(STEER_CTRL_Y),30 - len(mssa))) > 0:
+        for vml in range(int(min(-(STEER_CTRL_Y),30 - len(mssa)))):
           mssao+= ">"
       if 30 - len(mssa) - len(mssao) > 0:
         for vml in range(int(30 - len(mssa) - len(mssao))):
           mssas+= " "
       with open('./debug_out_1','w') as fp:
-        #fp.write('strAng:%0.1f->%0.1f[deg] , speed:%0.1f[km/h]' % (ypf , STEER_CTRL_Y - (handle_center) - ypf, v_ego * 3.6))
-        #fp.write('steerAngY:%0.1f[deg] , speed:%0.1f[km/h]' % (STEER_CTRL_Y - handle_center, v_ego * 3.6))
-        #fp.write('steerAng:%0.1f[deg] , speed:%0.1f[km/h]' % (STEER_CTRL_Y , v_ego * 3.6))
-        fp.write('strAng:%5.1f(%+5.1f[deg])%s%s%s^%s%s%s' % (ypf , STEER_CTRL_Y - (handle_center) - ypf, ssas,ssao,ssa,mssa,mssao,mssas))
+        #fp.write('strAng:%0.1f->%0.1f[deg] , speed:%0.1f[km/h]' % (ypf , STEER_CTRL_Y - ypf, v_ego * 3.6))
+        #fp.write('steerAngY:%0.1f[deg] , speed:%0.1f[km/h]' % (STEER_CTRL_Y, v_ego * 3.6))
+        #fp.write('steerAng:%0.1f[deg] , speed:%0.1f[km/h]' % (STEER_CTRL_Y + handle_center, v_ego * 3.6)) #ハンドルセンターなしの素のSTEER_CTRL_Yを表示
+        fp.write('strAng:%5.1f(%+5.1f[deg])%s%s%s^%s%s%s' % (ypf , STEER_CTRL_Y - ypf, ssas,ssao,ssa,mssa,mssao,mssas))
       
 
     if sm['carState'].leftBlinker == True:

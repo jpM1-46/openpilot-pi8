@@ -9,6 +9,10 @@ from selfdrive.swaglog import cloudlog
 STEER_SAME_DIRECTION_CT = 0
 STEER_OLD_ANGLE = 0
 STEERING_CENTER = -4.3
+with open('./handle_center_info.txt','r') as fp:
+  handle_center_info_str = fp.read()
+  if handle_center_info_str:
+    STEERING_CENTER = float(handle_center_info_str)
 
 TRAJECTORY_SIZE = 33
 # camera offset is meters from center car to camera
@@ -96,10 +100,10 @@ class LanePlanner:
     path_from_right_lane = self.rll_y - clipped_lane_width / 2.0
 
     prob_limit_angle = 6 #これよりハンドル角が大きい時で、カーブのアウト側がインより薄い認識だと、アウト側を無視してみる
-    if st_angle - STEERING_CENTER < -prob_limit_angle:
+    if st_angle < -prob_limit_angle:
       if r_prob > 0.5 and r_prob*0.8 > l_prob:
         l_prob = 0
-    elif st_angle - STEERING_CENTER > prob_limit_angle:
+    elif st_angle > prob_limit_angle:
       if l_prob > 0.5 and l_prob*0.8 > r_prob:
         r_prob = 0
     dcm = self.calc_dcm(st_angle, v_ego,clipped_lane_width,l_prob,r_prob)
@@ -120,7 +124,6 @@ class LanePlanner:
 #関数を最後に追加,dcm(ダイナミックカメラマージン？)名前がおかしいが、コーナーのイン側に寄せるオフセットである。
   def calc_dcm(self, st_angle, v_ego,clipped_lane_width,l_prob,r_prob):
     #数値を実際に取得して、調整してみる。
-    handle_center = STEERING_CENTER
     handle_margin = 1 #1.5
     handle_over = 10
     camera_margin = 0.1 #0.05 -> 0.1
@@ -129,7 +132,7 @@ class LanePlanner:
     w_add = 0
     global STEER_SAME_DIRECTION_CT
     global STEER_OLD_ANGLE
-    if (STEER_OLD_ANGLE - handle_center) * (st_angle - handle_center) > 0:
+    if (STEER_OLD_ANGLE) * (st_angle) > 0:
       STEER_SAME_DIRECTION_CT += 1
     else:
       STEER_SAME_DIRECTION_CT = 0
@@ -138,14 +141,14 @@ class LanePlanner:
       handle_margin = 1.5
       if STEER_SAME_DIRECTION_CT > 70 and clipped_lane_width - 2.5 >= 0:  #2.5 <- 1.9=prius width
         w_add = (clipped_lane_width - 2.5)  * 0.8 / 2.0
-    if st_angle > handle_center + handle_margin:
+    if st_angle > handle_margin:
       dcm = 0.01 - CAMERA_OFFSET + camera_margin
       dcm += w_add * 1.1 / 1.2
-      dcm *= min((st_angle -(handle_center + handle_margin)) / handle_over,1.2)
-    if st_angle < handle_center - handle_margin:
+      dcm *= min((st_angle -(handle_margin)) / handle_over,1.2)
+    if st_angle < -handle_margin:
       dcm = -0.11 - CAMERA_OFFSET - camera_margin
       dcm -= w_add * 0.8 / 1.2 #減速と合わせると相当寄りすぎなので小さく
-      dcm *= min(-(st_angle -(handle_center - handle_margin)) / handle_over,1.2)
+      dcm *= min(-(st_angle +(handle_margin)) / handle_over,1.2)
 #🟥🟥🟥🟥🟥🟥🟥
     if True:
       ms = "O:%+.2f" % (dcm)
