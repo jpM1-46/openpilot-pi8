@@ -243,7 +243,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   p.setPen(Qt::NoPen);
 
   configFont(p, "Open Sans", 48*max_disp_k, "Regular");
-  char *max_str = (tss_type == 0 ? "MA+" : (tss_type <= 1 ? "MAX" : "MAX2"));
+  const char *max_str = (tss_type == 0 ? "MA+" : (tss_type <= 1 ? "MAX" : "MAX2"));
   drawText(p, rc.center().x(), 118+y_ofs+max_disp_a, max_str, is_cruise_set ? 200 : 100);
   if (is_cruise_set) {
     float mm = maxSpeed.length() < 4 ? 1.1 : 1.0;
