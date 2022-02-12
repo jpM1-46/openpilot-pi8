@@ -222,6 +222,8 @@ void OnroadHud::updateState(const UIState &s) {
 static bool global_engageable;
 static int global_status;
 static float curve_value;
+static float handle_center = -100;
+
 void OnroadHud::paintEvent(QPaintEvent *event) {
   int y_ofs = 150;
   QPainter p(this);
@@ -318,6 +320,12 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   if (!hideDM) {
     drawIcon(p, radius / 2 + (bdr_s * 2), rect().bottom() - footer_h / 2,
              dm_img, QColor(0, 0, 0, 70), dmActive ? 1.0 : 0.2);
+  }
+
+  if(handle_center > -99){
+    //ハンドルセンター値を表示
+    configFont(p, "Open Sans", 33, "SemiBold");
+    drawText(p, rect().right()-50, 60+60, QString::number(handle_center,'f',2), 200);
   }
 }
 
@@ -442,13 +450,21 @@ void NvgWindow::knightScanner(QPainter &p) {
         }
       }
     }
+    std::string handle_center_txt = util::read_file("../manager/handle_center_info.txt");
+    if(handle_center_txt.empty() == false){
+        handle_center = std::stof(handle_center_txt);
+    }
   }
   p.setCompositionMode(QPainter::CompositionMode_Plus);
   for(int i=0; i<n; i++){
     //QRect rc(0, h_pos, ww, hh);
     if(t[i] > 0.01){
       //p.drawRoundedRect(rc, 0, 0);
-      p.setBrush(QColor(200, 0, 0, 255 * t[i]));
+      if(handle_center > -99){
+        p.setBrush(QColor(200, 0, 0, 255 * t[i]));
+      } else {
+        p.setBrush(QColor(200, 200, 0, 255 * t[i])); //ハンドルセンターキャリブレーション中は色を緑に。
+      }
       p.drawRect(rect_w * i / n, h_pos, ww, hh);
     }
     t[i] *= 0.9;
