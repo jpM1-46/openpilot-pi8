@@ -89,9 +89,9 @@ class LateralPlanner:
     max_yp = 0
     for yp in path_y:
       max_yp = yp if abs(yp) > abs(max_yp) else max_yp
-    if abs(max_yp) / 2.5 < 0.5:
+    if abs(max_yp) / 2.5 < 0.3 and v_ego > 20/3.6 and abs(STEER_CTRL_Y) < 10:
       STEERING_CENTER_calibration.append(STEER_CTRL_Y)
-      if len(STEERING_CENTER_calibration) > 100:
+      if len(STEERING_CENTER_calibration) > 1000: #10秒
         STEERING_CENTER_calibration.pop(0)
     if len(STEERING_CENTER_calibration) > 0:
       value_STEERING_CENTER_calibration = sum(STEERING_CENTER_calibration) / len(STEERING_CENTER_calibration)
