@@ -89,14 +89,18 @@ class LateralPlanner:
     max_yp = 0
     for yp in path_y:
       max_yp = yp if abs(yp) > abs(max_yp) else max_yp
-    if abs(max_yp) / 2.5 < 0.3 and v_ego > 20/3.6 and abs(STEER_CTRL_Y) < 10:
+    STEERING_CENTER_calibration_max = 300 #3秒
+    if abs(max_yp) / 2.5 < 0.1 and v_ego > 20/3.6 and abs(STEER_CTRL_Y) < 8:
       STEERING_CENTER_calibration.append(STEER_CTRL_Y)
-      if len(STEERING_CENTER_calibration) > 1000: #10秒
+      if len(STEERING_CENTER_calibration) > STEERING_CENTER_calibration_max:
         STEERING_CENTER_calibration.pop(0)
     if len(STEERING_CENTER_calibration) > 0:
       value_STEERING_CENTER_calibration = sum(STEERING_CENTER_calibration) / len(STEERING_CENTER_calibration)
     else:
       value_STEERING_CENTER_calibration = 0
+    if len(STEERING_CENTER_calibration) > STEERING_CENTER_calibration_max:
+      with open('./handle_center_info.txt','w') as fp:
+        fp.write('%0.2f' % (value_STEERING_CENTER_calibration) )
     with open('./debug_out_y','w') as fp:
       path_y_sum = -sum(path_y)
     #  #fp.write('{0}\n'.format(['%0.2f' % i for i in self.path_xyz[:,1]]))
