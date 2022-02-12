@@ -94,7 +94,7 @@ class LateralPlanner:
       if len(STEERING_CENTER_calibration) > 100:
         STEERING_CENTER_calibration.pop(0)
     if len(STEERING_CENTER_calibration) > 0:
-      value_STEERING_CENTER_calibration = sum（STEERING_CENTER_calibration）/ len(STEERING_CENTER_calibration)
+      value_STEERING_CENTER_calibration = sum(STEERING_CENTER_calibration) / len(STEERING_CENTER_calibration)
     else:
       value_STEERING_CENTER_calibration = 0
     with open('./debug_out_y','w') as fp:
