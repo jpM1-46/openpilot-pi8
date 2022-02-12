@@ -10,6 +10,8 @@ from selfdrive.config import Conversions as CV
 import cereal.messaging as messaging
 from cereal import log
 
+STEERING_CENTER_calibration = []
+
 LaneChangeState = log.LateralPlan.LaneChangeState
 LaneChangeDirection = log.LateralPlan.LaneChangeDirection
 
@@ -87,10 +89,18 @@ class LateralPlanner:
     max_yp = 0
     for yp in path_y:
       max_yp = yp if abs(yp) > abs(max_yp) else max_yp
-    #with open('./debug_out_y','w') as fp:
-    #  path_y_sum = -sum(path_y)
+    if abs(max_yp) < 0.5:
+      STEERING_CENTER_calibration.append(STEER_CTRL_Y)
+      if len(STEERING_CENTER_calibration) > 100:
+        STEERING_CENTER_calibration.pop(0)
+    if len(STEERING_CENTER_calibration) > 0:
+      value_STEERING_CENTER_calibration = sum（STEERING_CENTER_calibration）/ len(STEERING_CENTER_calibration)
+    else:
+      value_STEERING_CENTER_calibration = 0
+    with open('./debug_out_y','w') as fp:
+      path_y_sum = -sum(path_y)
     #  #fp.write('{0}\n'.format(['%0.2f' % i for i in self.path_xyz[:,1]]))
-    #  fp.write('max:%0.2f ; sum:%0.2f ; avg:%0.2f' % (-max_yp , path_y_sum, path_y_sum / len(path_y)) )
+      fp.write('calibration:%0.2f/%d ; max:%0.2f ; sum:%0.2f ; avg:%0.2f' % (value_STEERING_CENTER_calibration,len(STEERING_CENTER_calibration),-max_yp , path_y_sum, path_y_sum / len(path_y)) )
     handle_center = STEERING_CENTER
     ypf = STEER_CTRL_Y - handle_center
     if abs(STEER_CTRL_Y - handle_center) < abs(max_yp) / 2.5:
