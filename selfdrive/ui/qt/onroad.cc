@@ -169,6 +169,7 @@ OnroadHud::OnroadHud(QWidget *parent) : QWidget(parent) {
 }
 
 static float vc_speed;
+static int tss_type = 0;
 void OnroadHud::updateState(const UIState &s) {
   const int SET_SPEED_NA = 557; //255;
   const SubMaster &sm = *(s.sm);
@@ -176,15 +177,18 @@ void OnroadHud::updateState(const UIState &s) {
 
   float maxspeed = cs.getVCruise();
   vc_speed = sm["carState"].getCarState().getVEgo();
-  std::string tss_type_txt = util::read_file("../manager/tss_type_info.txt");
-  bool tss2 = false;
-  if(tss_type_txt.empty() == false){
-    if ( tss_type_txt == "2" ) {
-      //TSS2
-      tss2 = true;
+  if(tss_type == 0){
+    std::string tss_type_txt = util::read_file("../manager/tss_type_info.txt");
+    if(tss_type_txt.empty() == false){
+      if ( tss_type_txt == "2" ) {
+        //TSS2
+        tss_type = 2;
+      } else if ( tss_type_txt == "1" ){
+        tss_type = 1;
+      }
     }
   }
-  if(tss2 == false){
+  if(tss_type <= 1){
     //これまでと互換。tss_type_infoがなければTSSP
     maxspeed = maxspeed < (55 - 4) ? (55 - (55 - (maxspeed+4)) * 2 - 4) : maxspeed;
     maxspeed = maxspeed > (110 - 6) ? (110 + ((maxspeed+6) - 110) * 3 - 6) : maxspeed;
@@ -239,7 +243,8 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   p.setPen(Qt::NoPen);
 
   configFont(p, "Open Sans", 48*max_disp_k, "Regular");
-  drawText(p, rc.center().x(), 118+y_ofs+max_disp_a, "MAX", is_cruise_set ? 200 : 100);
+  char *max_str = (tss_type == 0 ? "MA+" : (tss_type <= 1 ? "MAX" : "MAX2"));
+  drawText(p, rc.center().x(), 118+y_ofs+max_disp_a, max_str, is_cruise_set ? 200 : 100);
   if (is_cruise_set) {
     float mm = maxSpeed.length() < 4 ? 1.1 : 1.0;
     configFont(p, "Open Sans", 88*max_disp_k*mm, is_cruise_set ? "Bold" : "SemiBold");
