@@ -316,12 +316,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
              engage_img, bg_colors[status], 1.0);
   }
 
-  // dm icon
-  if (!hideDM) {
-    drawIcon(p, radius / 2 + (bdr_s * 2), rect().bottom() - footer_h / 2,
-             dm_img, QColor(0, 0, 0, 70), dmActive ? 1.0 : 0.2);
-  }
-
+  //キャリブレーション値の表示。dm iconより先にやらないと透明度が連動してしまう。
   p.setPen(QPen(QColor(0xff, 0xff, 0xff, 0), 0));
   QRect rc2(rect().right() - radius / 2 - bdr_s * 2 - 100, -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius-36, 200, 36);
   if(engageable || handle_center > -99){
@@ -330,18 +325,26 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
     p.drawRoundedRect(rc2, 18, 18);
     p.setPen(Qt::NoPen);
 
-    handle_center = -4.73;
+    float hc = -4.73;
+    //float hc = handle_center;
 
     configFont(p, "Open Sans", 33, "SemiBold");
-    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 2, QString::number(handle_center,'f',2), 200);
+    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 5, QString::number(hc,'f',2), 200);
   } else {
     p.setBrush(QColor(150, 150, 0, 0xf1));
     p.drawRoundedRect(rc2, 18, 18);
     p.setPen(Qt::NoPen);
 
     configFont(p, "Open Sans", 33, "Regular");
-    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 5, "Calibrating", 200);
+    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 7, "Calibrating", 200);
   }
+  
+  // dm icon
+  if (!hideDM) {
+    drawIcon(p, radius / 2 + (bdr_s * 2), rect().bottom() - footer_h / 2,
+             dm_img, QColor(0, 0, 0, 70), dmActive ? 1.0 : 0.2);
+  }
+
 }
 
 void OnroadHud::drawText(QPainter &p, int x, int y, const QString &text, int alpha) {
