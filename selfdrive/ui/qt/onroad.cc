@@ -328,15 +328,15 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
     float hc = -4.73;
     //float hc = handle_center;
 
-    configFont(p, "Open Sans", 33, "SemiBold");
-    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 5, QString::number(hc,'f',2), 200);
+    configFont(p, "Open Sans", 33, "Bold");
+    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 6, QString::number(hc,'f',2), 200);
   } else {
     p.setBrush(QColor(150, 150, 0, 0xf1));
     p.drawRoundedRect(rc2, 18, 18);
     p.setPen(Qt::NoPen);
 
     configFont(p, "Open Sans", 33, "Regular");
-    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 7, "Calibrating", 200);
+    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 8, "Calibrating", 200);
   }
   
   // dm icon
