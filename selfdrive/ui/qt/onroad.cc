@@ -319,14 +319,14 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   //キャリブレーション値の表示。dm iconより先にやらないと透明度が連動してしまう。
   p.setPen(QPen(QColor(0xff, 0xff, 0xff, 0), 0));
   QRect rc2(rect().right() - radius / 2 - bdr_s * 2 - 100, -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius-36, 200, 36);
-  if(engageable || handle_center > -99){
+  if(/*engageable ||*/ handle_center > -99){
     //ハンドルセンター値を表示
-    p.setBrush(bg_colors[STATUS_ENGAGED]);
+    p.setBrush(bg_colors[status]);
     p.drawRoundedRect(rc2, 18, 18);
     p.setPen(Qt::NoPen);
 
-    float hc = -4.73;
-    //float hc = handle_center;
+    //float hc = -4.73;
+    float hc = handle_center;
 
     configFont(p, "Open Sans", 33, "Bold");
     drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 6, QString::number(hc,'f',2), 200);

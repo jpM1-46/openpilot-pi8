@@ -1,1 +1,1 @@
-#define COMMA_VERSION "0.8.12-release-ip1"
+#define COMMA_VERSION "0.8.12-release-pi1"
