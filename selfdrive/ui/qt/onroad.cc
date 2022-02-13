@@ -223,6 +223,7 @@ static bool global_engageable;
 static int global_status;
 static float curve_value;
 static float handle_center = -100;
+static int handle_calibct = 0;
 
 void OnroadHud::paintEvent(QPaintEvent *event) {
   int y_ofs = 150;
@@ -335,8 +336,13 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
     p.drawRoundedRect(rc2, 18, 18);
     p.setPen(Qt::NoPen);
 
-    configFont(p, "Open Sans", 33, "Regular");
-    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 8, "Calibrating", 200);
+    if(handle_calibct == 0){
+      configFont(p, "Open Sans", 33, "Regular");
+      drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 8, "Calibrating", 200);
+    } else {
+      configFont(p, "Open Sans", 33, "Bold");
+      drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 6, QString::number(handle_calibct) + '%', 200);
+    }
   }
   
   // dm icon
@@ -471,6 +477,11 @@ void NvgWindow::knightScanner(QPainter &p) {
     std::string handle_center_txt = util::read_file("../manager/handle_center_info.txt");
     if(handle_center_txt.empty() == false){
         handle_center = std::stof(handle_center_txt);
+    } else {
+      std::string handle_calibct_txt = util::read_file("../manager/handle_calibct_info.txt");
+      if(handle_calibct_txt.empty() == false){
+        handle_calibct = std::stoi(handle_calibct_txt);
+      }
     }
   }
   p.setCompositionMode(QPainter::CompositionMode_Plus);
