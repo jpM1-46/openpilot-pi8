@@ -322,18 +322,20 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
              dm_img, QColor(0, 0, 0, 70), dmActive ? 1.0 : 0.2);
   }
 
+  p.setPen(QPen(QColor(0xff, 0xff, 0xff, 0), 0));
+  QRect rc2(rect().right() - radius / 2 - bdr_s * 2 - 100, radius / 2 + int(bdr_s * 1.5)+y_ofs + radius-36, 200, 36);
   if(handle_center > -99){
     //ハンドルセンター値を表示
-    QRect rc2(rect().right() - radius / 2 - bdr_s * 2 - 100, radius / 2 + int(bdr_s * 1.5)+y_ofs + radius, 200, 36);
     p.setBrush(bg_colors[STATUS_ENGAGED]);
     p.drawRoundedRect(rc2, 18, 18);
+    p.setPen(Qt::NoPen);
 
     configFont(p, "Open Sans", 33, "SemiBold");
     drawText(p, rect().right() - radius / 2 - bdr_s * 2 , radius / 2 + int(bdr_s * 1.5)+y_ofs + radius, QString::number(handle_center,'f',2), 200);
   } else {
-    QRect rc2(rect().right() - radius / 2 - bdr_s * 2 - 100, radius / 2 + int(bdr_s * 1.5)+y_ofs + radius, 200, 36);
-    p.setBrush(QColor(100, 100, 0, 100));
+    p.setBrush(QColor(150, 150, 0, 100));
     p.drawRoundedRect(rc2, 18, 18);
+    p.setPen(Qt::NoPen);
 
     configFont(p, "Open Sans", 33, "Regular");
     drawText(p, rect().right() - radius / 2 - bdr_s * 2 , radius / 2 + int(bdr_s * 1.5)+y_ofs + radius, "Calibrating", 200);
