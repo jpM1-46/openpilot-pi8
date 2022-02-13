@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from cereal import log
 from common.filter_simple import FirstOrderFilter
@@ -9,10 +10,11 @@ from selfdrive.swaglog import cloudlog
 STEER_SAME_DIRECTION_CT = 0
 STEER_OLD_ANGLE = 0
 STEERING_CENTER = -4.3
-with open('./handle_center_info.txt','r') as fp:
-  handle_center_info_str = fp.read()
-  if handle_center_info_str:
-    STEERING_CENTER = float(handle_center_info_str)
+if os.path.isfile('./handle_center_info.txt'):
+  with open('./handle_center_info.txt','r') as fp:
+    handle_center_info_str = fp.read()
+    if handle_center_info_str:
+      STEERING_CENTER = float(handle_center_info_str)
 
 TRAJECTORY_SIZE = 33
 # camera offset is meters from center car to camera
