@@ -325,10 +325,10 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   if(handle_center > -99){
     //ハンドルセンター値を表示
     configFont(p, "Open Sans", 33, "SemiBold");
-    drawText(p, rect().right() - radius / 2 - bdr_s * 2, , radius / 2 + int(bdr_s * 1.5)+y_ofs + radius + 20, QString::number(handle_center,'f',2), 200);
+    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , radius / 2 + int(bdr_s * 1.5)+y_ofs + radius + 20, QString::number(handle_center,'f',2), 200);
   } else {
     configFont(p, "Open Sans", 33, "Regular");
-    drawText(p, rect().right() - radius / 2 - bdr_s * 2, , radius / 2 + int(bdr_s * 1.5)+y_ofs + radius + 20, "Calibrating", 200);
+    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , radius / 2 + int(bdr_s * 1.5)+y_ofs + radius + 20, "Calibrating", 200);
   }
 }
 
