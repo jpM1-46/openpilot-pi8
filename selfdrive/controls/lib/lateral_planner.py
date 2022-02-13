@@ -99,7 +99,7 @@ class LateralPlanner:
     else:
       value_STEERING_CENTER_calibration = 0
     handle_center = STEERING_CENTER
-    if len(STEERING_CENTER_calibration) > STEERING_CENTER_calibration_max:
+    if len(STEERING_CENTER_calibration) >= STEERING_CENTER_calibration_max:
       handle_center = value_STEERING_CENTER_calibration #動的に求めたハンドルセンターを使う。
       with open('./handle_center_info.txt','w') as fp:
         fp.write('%0.2f' % (value_STEERING_CENTER_calibration) )
