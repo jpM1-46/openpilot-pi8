@@ -320,6 +320,12 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   //キャリブレーション値の表示。dm iconより先にやらないと透明度が連動してしまう。
   p.setPen(QPen(QColor(0xff, 0xff, 0xff, 0), 0));
   QRect rc2(rect().right() - radius / 2 - bdr_s * 2 - 100, -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius-36, 200, 36);
+  if(/*engageable ||*/ handle_center == -100){
+    std::string handle_center_txt = util::read_file("../manager/handle_center_info.txt");
+    if(handle_center_txt.empty() == false){
+        handle_center = std::stof(handle_center_txt);
+    }
+  }
   if(/*engageable ||*/ handle_center > -99){
     //ハンドルセンター値を表示
     p.setBrush(bg_colors[status]);
