@@ -222,7 +222,7 @@ class Planner:
         fp.write("%s\n%s\n%s" % (msc ,msl ,msv))
 
     v_desired_rand = 0 #低速の時わざと揺らしてみる。
-    if v_ego < 41 / 3.6
+    if v_ego < 41 / 3.6:
       v_desired_rand = random.random() * 0.1 / 3.6
       v_desired_rand *= v_ego / 41/3.6
     
