@@ -20,6 +20,7 @@ from selfdrive.controls.lib.lane_planner import LanePlanner, TRAJECTORY_SIZE , S
 from common.params import Params
 PARAMS = Params()
 CVS_FRAME = 0
+handle_center = STEERING_CENTER
 
 def calc_limit_vc(X1,X2,X3 , Y1,Y2,Y3):
   Z1 = (X2-X1)/(Y1-Y2) - (X3-X2)/(Y2-Y3)
@@ -117,8 +118,7 @@ class Planner:
       OP_ENABLE_v_cruise_kph = 0
     if OP_ENABLE_v_cruise_kph != 0:
       v_cruise_kph = OP_ENABLE_gas_speed*3.6 #エンゲージ初期クルーズ速度を優先して使う
-    handle_center = STEERING_CENTER
-    if os.path.isfile('./handle_center_info.txt'):
+    if CVS_FRAME % 5 == 4 and os.path.isfile('./handle_center_info.txt'):
       with open('./handle_center_info.txt','r') as fp:
         handle_center_info_str = fp.read()
         if handle_center_info_str:
@@ -222,12 +222,12 @@ class Planner:
         fp.write("%s\n%s\n%s" % (msc ,msl ,msv))
 
     v_desired_rand = 0 #低速の時わざと揺らしてみる。
-    if v_ego < 41 / 3.6 and v_ego > 0:
-      v_desired_rand = random.random() * 1.0 / 3.6
-      v_desired_rand *= v_ego / 41/3.6
-    
-    with open('./debug_out_vd','w') as fp:
-      fp.write('v:%.2f , vd:%.2f[km/h] ; vr:%.2f , ad:%.2f[m/ss]' % (v_ego * 3.6 , self.v_desired* 3.6 , v_desired_rand * 3.6 , self.a_desired) )
+    #if v_ego < 41 / 3.6 and v_ego > 0:
+    #  v_desired_rand = random.random() * 1.0 / 3.6
+    #  v_desired_rand *= v_ego / 41/3.6
+    #
+    #with open('./debug_out_vd','w') as fp:
+    #  fp.write('v:%.2f , vd:%.2f[km/h] ; vr:%.2f , ad:%.2f[m/ss]' % (v_ego * 3.6 , self.v_desired* 3.6 , v_desired_rand * 3.6 , self.a_desired) )
 
     accel_limits = [A_CRUISE_MIN, get_max_accel(v_ego)]
     #accel_limits_turns = limit_accel_in_turns(v_ego, sm['carState'].steeringAngleDeg, accel_limits, self.CP)
