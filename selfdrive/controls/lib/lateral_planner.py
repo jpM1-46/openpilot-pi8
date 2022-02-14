@@ -109,7 +109,7 @@ class LateralPlanner:
           fp.write('%0.2f' % (value_STEERING_CENTER_calibration) )
     else:
       with open('./handle_calibct_info.txt','w') as fp:
-        fp.write('%d' % (len(STEERING_CENTER_calibration+2) / (STEERING_CENTER_calibration_max / 100)) )
+        fp.write('%d' % ((len(STEERING_CENTER_calibration)+2) / (STEERING_CENTER_calibration_max / 100)) )
     #with open('./debug_out_y','w') as fp:
     #  path_y_sum = -sum(path_y)
     ##  #fp.write('{0}\n'.format(['%0.2f' % i for i in self.path_xyz[:,1]]))
