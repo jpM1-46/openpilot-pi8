@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import math
 import numpy as np
 from common.numpy_fast import interp
@@ -116,10 +117,11 @@ class Planner:
     if OP_ENABLE_v_cruise_kph != 0:
       v_cruise_kph = OP_ENABLE_gas_speed*3.6 #エンゲージ初期クルーズ速度を優先して使う
     handle_center = STEERING_CENTER
-    with open('./handle_center_info.txt','r') as fp:
-      handle_center_info_str = fp.read()
-      if handle_center_info_str:
-        handle_center = float(handle_center_info_str)
+    if os.path.isfile('./handle_center_info.txt'):
+      with open('./handle_center_info.txt','r') as fp:
+        handle_center_info_str = fp.read()
+        if handle_center_info_str:
+          handle_center = float(handle_center_info_str)
 
     steerAng = sm['carState'].steeringAngleDeg - handle_center
     orgSteerAng = steerAng
@@ -217,7 +219,7 @@ class Planner:
         fp.write('ah:%.2f bh:%.2f ch:%.2f\n' % (LIMIT_VC_AH,LIMIT_VC_BH,LIMIT_VC_CH) )
         #fp.write('op:[%d] vk:%.2f gs:%.2fkm/h\n' % (OP_ENABLE_PREV,OP_ENABLE_v_cruise_kph,OP_ENABLE_gas_speed*3.6) )
         fp.write("%s\n%s\n%s" % (msc ,msl ,msv))
-        
+
     with open('./debug_out_vd','w') as fp:
       fp.write('v:%.2f , vd:%.2f[km/h] ; a:%.2f , ad:%.2f[m/ss]' % (v_ego * 3.6 , self.v_desired* 3.6 , a_ego , self.a_desired) )
 
