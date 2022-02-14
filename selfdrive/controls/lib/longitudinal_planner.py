@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import random
 import math
 import numpy as np
 from common.numpy_fast import interp
@@ -220,8 +221,13 @@ class Planner:
         #fp.write('op:[%d] vk:%.2f gs:%.2fkm/h\n' % (OP_ENABLE_PREV,OP_ENABLE_v_cruise_kph,OP_ENABLE_gas_speed*3.6) )
         fp.write("%s\n%s\n%s" % (msc ,msl ,msv))
 
+    v_desired_rand = 0 #低速の時わざと揺らしてみる。
+    if v_ego < 41 / 3.6
+      v_desired_rand = random.random() * 0.1 / 3.6
+      v_desired_rand *= v_ego / 41/3.6
+    
     with open('./debug_out_vd','w') as fp:
-      fp.write('v:%.2f , vd:%.2f[km/h] ; a:%.2f , ad:%.2f[m/ss]' % (v_ego * 3.6 , self.v_desired* 3.6 , a_ego , self.a_desired) )
+      fp.write('v:%.2f , vd:%.2f[km/h] ; vr:%.2f , ad:%.2f[m/ss]' % (v_ego * 3.6 , self.v_desired* 3.6 , v_desired_rand , self.a_desired) )
 
     accel_limits = [A_CRUISE_MIN, get_max_accel(v_ego)]
     #accel_limits_turns = limit_accel_in_turns(v_ego, sm['carState'].steeringAngleDeg, accel_limits, self.CP)
@@ -234,7 +240,7 @@ class Planner:
     accel_limits_turns[0] = min(accel_limits_turns[0], self.a_desired + 0.05)
     accel_limits_turns[1] = max(accel_limits_turns[1], self.a_desired - 0.05)
     self.mpc.set_accel_limits(accel_limits_turns[0], accel_limits_turns[1])
-    self.mpc.set_cur_state(self.v_desired, self.a_desired)
+    self.mpc.set_cur_state(self.v_desired + v_desired_rand, self.a_desired)
     self.mpc.update(sm['carState'], sm['radarState'], v_cruise, prev_accel_constraint=prev_accel_constraint)
     self.v_desired_trajectory = np.interp(T_IDXS[:CONTROL_N], T_IDXS_MPC, self.mpc.v_solution)
     self.a_desired_trajectory = np.interp(T_IDXS[:CONTROL_N], T_IDXS_MPC, self.mpc.a_solution)
