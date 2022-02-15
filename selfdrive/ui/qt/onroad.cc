@@ -373,7 +373,7 @@ void OnroadHud::drawText(QPainter &p, int x, int y, const QString &text, int alp
   p.drawText(real_rect.x(), real_rect.bottom(), text);
 }
 
-void OnroadHud::drawText(QPainter &p, int x, int y, const QString &text, QColor &col) {
+void OnroadHud::drawText(QPainter &p, int x, int y, const QString &text, const QColor &col) {
   QFontMetrics fm(p.font());
   QRect init_rect = fm.boundingRect(text);
   QRect real_rect = fm.boundingRect(init_rect, 0, text);
