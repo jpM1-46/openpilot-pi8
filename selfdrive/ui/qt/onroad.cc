@@ -323,7 +323,9 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
 
   //キャリブレーション値の表示。dm iconより先にやらないと透明度が連動してしまう。
   p.setPen(QPen(QColor(0xff, 0xff, 0xff, 0), 0));
-  QRect rc2(rect().right() - radius / 2 - bdr_s * 2 - 100, -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius-36, 200, 36);
+  //int calib_h = radius;
+  int calib_h = -33 -33; //表示位置を上に
+  QRect rc2(rect().right() - radius / 2 - bdr_s * 2 - 100, -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + calib_h -36, 200, 36);
   if(/*engageable ||*/ handle_center == -100){
     std::string handle_center_txt = util::read_file("../manager/handle_center_info.txt");
     if(handle_center_txt.empty() == false){
@@ -340,7 +342,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
     float hc = handle_center;
 
     configFont(p, "Open Sans", 33, "Bold");
-    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs /*+ radius*/ - 8, QString::number(hc,'f',2) + "deg", 200);
+    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + calib_h - 8, QString::number(hc,'f',2) + "deg", 200);
   } else {
     p.setBrush(QColor(150, 150, 0, 0xf1));
     p.drawRoundedRect(rc2, 18, 18);
@@ -348,10 +350,10 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
 
     if(handle_calibct == 0){
       configFont(p, "Open Sans", 33, "Regular");
-      drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs /*+ radius*/ - 8, "Calibrating", 200);
+      drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + calib_h - 8, "Calibrating", 200);
     } else {
       configFont(p, "Open Sans", 33, "Bold");
-      drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs /*+ radius*/ - 6, QString::number(handle_calibct) + '%', 200);
+      drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + calib_h - 6, QString::number(handle_calibct) + '%', 200);
     }
   }
   
