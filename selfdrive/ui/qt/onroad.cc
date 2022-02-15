@@ -259,10 +259,10 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
 
   // current speed
   configFont(p, "Open Sans", 176, "Bold");
-  drawText(p, rect().center().x()-15, 210+y_ofs-5, speed);
-  drawText(p, rect().center().x()+15, 210+y_ofs-5, speed);
-  drawText(p, rect().center().x(), -15+210+y_ofs-5, speed);
-  drawText(p, rect().center().x(), +15+210+y_ofs-5, speed);
+  drawText(p, rect().center().x()-15, 210+y_ofs-5, speed,bg_colors[status]);
+  drawText(p, rect().center().x()+15, 210+y_ofs-5, speed,bg_colors[status]);
+  drawText(p, rect().center().x(), -15+210+y_ofs-5, speed,bg_colors[status]);
+  drawText(p, rect().center().x(), +15+210+y_ofs-5, speed,bg_colors[status]);
   drawText(p, rect().center().x(), 210+y_ofs-5, speed);
   configFont(p, "Open Sans", 66, "Regular");
   drawText(p, rect().center().x(), 290+y_ofs-5, speedUnit, 200);
