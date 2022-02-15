@@ -86,7 +86,7 @@ class Planner:
     v_ego = sm['carState'].vEgo
     a_ego = sm['carState'].aEgo
 
-    global CVS_FRAME
+    global CVS_FRAME , handle_center , OP_ENABLE_PREV , OP_ENABLE_v_cruise_kph , OP_ENABLE_gas_speed
     v_cruise_kph = sm['controlsState'].vCruise
     if self.CP.carFingerprint not in TSS2_CAR:
       v_cruise_kph = (55 - (55 - (v_cruise_kph+4)) * 2 - 4) if v_cruise_kph < (55 - 4) else v_cruise_kph
@@ -98,9 +98,6 @@ class Planner:
       if CVS_FRAME % 5 == 3 and CVS_FRAME < 30:
         with open('./tss_type_info.txt','w') as fp:
           fp.write('%d' % (2))
-    global OP_ENABLE_PREV
-    global OP_ENABLE_v_cruise_kph
-    global OP_ENABLE_gas_speed
     #if OP_ENABLE_PREV == False and sm['controlsState'].longControlState != LongCtrlState.off and v_ego > 3/3.6: # and sm['carState'].gasPressed:
        #速度が時速３km以上なら、無条件にエクストラエンゲージするテスト 
     if OP_ENABLE_PREV == False and sm['controlsState'].longControlState != LongCtrlState.off and sm['carState'].gasPressed:
