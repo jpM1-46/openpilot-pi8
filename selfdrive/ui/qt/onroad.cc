@@ -521,7 +521,7 @@ void NvgWindow::knightScanner(QPainter &p) {
   p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 }
 
-void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd) {
+void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd , int num) {
   const float speedBuff = 10.;
   const float leadBuff = 40.;
   const float d_rel = lead_data.getX()[0];
@@ -552,12 +552,16 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
   painter.setBrush(redColor(fillAlpha));
   painter.drawPolygon(chevron, std::size(chevron));
 
-  float dist = d_rel; //lead_data.getT()[0];
-  painter.setPen(QColor(0xff, 0xff, 0xff));
-  configFont(painter, "Open Sans", 44, "SemiBold");
-  painter.drawText(QRect(x, y-50, 200, 50), Qt::AlignBottom | Qt::AlignLeft, QString::number(dist,'f',1) + "m");
-  painter.setPen(Qt::NoPen);
-
+  if(num == 0){
+    //float dist = d_rel; //lead_data.getT()[0];
+    QString dist = QString::number(d_rel,'f',1) + "m";
+    configFont(painter, "Open Sans", 44, "SemiBold");
+    painter.setPen(QColor(0x0, 0x0, 0x0 , 200)); //影
+    painter.drawText(QRect(x+2, y-50+2, 200, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
+    painter.setPen(QColor(0xff, 0xff, 0xff));
+    painter.drawText(QRect(x, y-50, 200, 50), Qt::AlignBottom | Qt::AlignLeft, Qdist);
+    painter.setPen(Qt::NoPen);
+  }
 }
 
 void NvgWindow::paintGL() {
@@ -574,10 +578,10 @@ void NvgWindow::paintGL() {
     if (s->scene.longitudinal_control) {
       auto leads = (*s->sm)["modelV2"].getModelV2().getLeadsV3();
       if (leads[0].getProb() > .5) {
-        drawLead(painter, leads[0], s->scene.lead_vertices[0]);
+        drawLead(painter, leads[0], s->scene.lead_vertices[0] , 0);
       }
       if (leads[1].getProb() > .5 && (std::abs(leads[1].getX()[0] - leads[0].getX()[0]) > 3.0)) {
-        drawLead(painter, leads[1], s->scene.lead_vertices[1]);
+        drawLead(painter, leads[1], s->scene.lead_vertices[1] , 1);
       }
     }
   }
