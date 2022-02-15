@@ -559,7 +559,7 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
     painter.setPen(QColor(0x0, 0x0, 0x0 , 200)); //影
     painter.drawText(QRect(x+2, y-50+2, 200, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
     painter.setPen(QColor(0xff, 0xff, 0xff));
-    painter.drawText(QRect(x, y-50, 200, 50), Qt::AlignBottom | Qt::AlignLeft, Qdist);
+    painter.drawText(QRect(x, y-50, 200, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
     painter.setPen(Qt::NoPen);
   }
 }
