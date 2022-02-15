@@ -340,7 +340,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
     float hc = handle_center;
 
     configFont(p, "Open Sans", 33, "Bold");
-    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 8, QString::number(hc,'f',2) + "deg", 200);
+    drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs /*+ radius*/ - 8, QString::number(hc,'f',2) + "deg", 200);
   } else {
     p.setBrush(QColor(150, 150, 0, 0xf1));
     p.drawRoundedRect(rc2, 18, 18);
@@ -348,10 +348,10 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
 
     if(handle_calibct == 0){
       configFont(p, "Open Sans", 33, "Regular");
-      drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 8, "Calibrating", 200);
+      drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs /*+ radius*/ - 8, "Calibrating", 200);
     } else {
       configFont(p, "Open Sans", 33, "Bold");
-      drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs + radius - 6, QString::number(handle_calibct) + '%', 200);
+      drawText(p, rect().right() - radius / 2 - bdr_s * 2 , -20 + radius / 2 + int(bdr_s * 1.5)+y_ofs /*+ radius*/ - 6, QString::number(handle_calibct) + '%', 200);
     }
   }
   
@@ -552,7 +552,7 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
   painter.setBrush(redColor(fillAlpha));
   painter.drawPolygon(chevron, std::size(chevron));
 
-  if(num == 0){
+  if(num == 0){ //0番のリードカーまでの距離を表示
     //float dist = d_rel; //lead_data.getT()[0];
     QString dist = QString::number(d_rel,'f',1) + "m";
     configFont(painter, "Open Sans", 44, "SemiBold");
