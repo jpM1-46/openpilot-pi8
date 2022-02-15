@@ -251,10 +251,6 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   if (is_cruise_set) {
     float mm = maxSpeed.length() < 4 ? 1.1 : 1.0;
     configFont(p, "Open Sans", 88*max_disp_k*mm, is_cruise_set ? "Bold" : "SemiBold");
-    drawText(p, rc.center().x() - 5, 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, maxSpeed, bg_colors[status]);
-    drawText(p, rc.center().x() + 5, 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, maxSpeed, bg_colors[status]);
-    drawText(p, rc.center().x() , -5 + 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, maxSpeed, bg_colors[status]);
-    drawText(p, rc.center().x() , +5 + 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, maxSpeed, bg_colors[status]);
     drawText(p, rc.center().x(), 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, maxSpeed, 255);
   } else {
     configFont(p, "Open Sans", 80*max_disp_k*1.1, "SemiBold");
@@ -263,6 +259,10 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
 
   // current speed
   configFont(p, "Open Sans", 176, "Bold");
+  drawText(p, rect().center().x()-15, 210+y_ofs-5, speed);
+  drawText(p, rect().center().x()+15, 210+y_ofs-5, speed);
+  drawText(p, rect().center().x(), -15+210+y_ofs-5, speed);
+  drawText(p, rect().center().x(), +15+210+y_ofs-5, speed);
   drawText(p, rect().center().x(), 210+y_ofs-5, speed);
   configFont(p, "Open Sans", 66, "Regular");
   drawText(p, rect().center().x(), 290+y_ofs-5, speedUnit, 200);
