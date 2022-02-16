@@ -161,7 +161,10 @@ class Planner:
         if v_cruise_kph == limit_vc:
           fp.write('%d.' % (v_cruise_kph))
         else:
-          fp.write('%d' % (v_cruise_kph_org))
+          vo = v_cruise_kph_org
+          if int(vo) == 59 or int(vo) == 61:
+            vo += 0.5 #メーター表示誤差補正
+          fp.write('%d' % (vo))
     #if CVS_FRAME % 10 == 0 and limit_vc < V_CRUISE_MAX and v_ego * 3.6 > 20: # over 20km/h
     #  with open('./ml_data.csv','a') as fp:
     #    fp.write('%s%0.2f\n' % (ml_csv , limit_vc))
