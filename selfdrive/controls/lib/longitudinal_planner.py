@@ -100,6 +100,8 @@ class Planner:
       if CVS_FRAME % 5 == 3 and CVS_FRAME < 30:
         with open('./tss_type_info.txt','w') as fp:
           fp.write('%d' % (2))
+    if v_cruise_kph < min_acc_speed:
+      v_cruise_kph = min_acc_speed #念のため
     if OP_ENABLE_PREV == False and sm['controlsState'].longControlState != LongCtrlState.off and ((v_ego > 3/3.6 and v_ego < min_acc_speed/3.6 and int(v_cruise_kph) == min_acc_speed) or sm['carState'].gasPressed):
        #速度が時速３km以上かつ31km未満かつsm['controlsState'].vCruiseが最低速度なら、アクセル踏んでなくても無条件にエクストラエンゲージする
     #if tss2_flag == False and OP_ENABLE_PREV == False and sm['controlsState'].longControlState != LongCtrlState.off and sm['carState'].gasPressed:
