@@ -560,15 +560,16 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
   if(num == 0){ //0番のリードカーまでの距離を表示
     //float dist = d_rel; //lead_data.getT()[0];
     QString dist = QString::number(d_rel,'f',1) + "m";
+    int str_w = 600; //200
     dist += QString::number(v_rel,'f',1) + "v";
     dist += QString::number(t_rel,'f',1) + "t";
     dist += QString::number(y_rel,'f',1) + "y";
     dist += QString::number(a_rel,'f',1) + "a";
     configFont(painter, "Open Sans", 44, "SemiBold");
     painter.setPen(QColor(0x0, 0x0, 0x0 , 200)); //影
-    painter.drawText(QRect(x+2, y-50+2, 200, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
+    painter.drawText(QRect(x+2, y-50+2, str_w, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
     painter.setPen(QColor(0xff, 0xff, 0xff));
-    painter.drawText(QRect(x, y-50, 200, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
+    painter.drawText(QRect(x, y-50, str_w, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
     painter.setPen(Qt::NoPen);
   }
 }
