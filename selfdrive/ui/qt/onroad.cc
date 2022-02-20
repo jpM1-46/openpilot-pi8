@@ -530,7 +530,7 @@ void NvgWindow::knightScanner(QPainter &p) {
   p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 }
 
-void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd , int num) {
+void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd , int num , size_t leads_num) {
   const float speedBuff = 10.;
   const float leadBuff = 40.;
   const float d_rel = lead_data.getX()[0];
@@ -568,6 +568,7 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
     //float dist = d_rel; //lead_data.getT()[0];
     QString dist = QString::number(d_rel,'f',1) + "m";
     int str_w = 200;
+    dist += "<" + QString::number(leads_num) + ">"
 //   int str_w = 600; //200;
 //    dist += QString::number(v_rel,'f',1) + "v";
 //    dist += QString::number(t_rel,'f',1) + "t";
@@ -595,11 +596,12 @@ void NvgWindow::paintGL() {
 
     if (s->scene.longitudinal_control) {
       auto leads = (*s->sm)["modelV2"].getModelV2().getLeadsV3();
+      size_t leads_num = leads.size();
       if (leads[0].getProb() > .5) {
-        drawLead(painter, leads[0], s->scene.lead_vertices[0] , 0);
+        drawLead(painter, leads[0], s->scene.lead_vertices[0] , 0 , leads_num);
       }
       if (leads[1].getProb() > .5 && (std::abs(leads[1].getX()[0] - leads[0].getX()[0]) > 3.0)) {
-        drawLead(painter, leads[1], s->scene.lead_vertices[1] , 1);
+        drawLead(painter, leads[1], s->scene.lead_vertices[1] , 1 , leads_num);
       }
     }
   }
