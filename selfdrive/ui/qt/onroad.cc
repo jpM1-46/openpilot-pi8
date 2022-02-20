@@ -590,27 +590,27 @@ struct LeadcarLockon {
 LeadcarLockon leadcar_lockon[LeadcarLockon_MAX];
 
 void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd , int num , size_t leads_num) {
-    const float speedBuff = 10.;
-  const float leadBuff = 40.;
+  //const float speedBuff = 10.;
+  //const float leadBuff = 40.;
   const float d_rel = lead_data.getX()[0];
-  const float v_rel = lead_data.getV()[0];
-//  const float t_rel = lead_data.getT()[0];
-//  const float y_rel = lead_data.getY()[0];
-//  const float a_rel = lead_data.getA()[0];
+  //const float v_rel = lead_data.getV()[0];
+  //const float t_rel = lead_data.getT()[0];
+  //const float y_rel = lead_data.getY()[0];
+  //const float a_rel = lead_data.getA()[0];
 
-  float sz = std::clamp((25 * 30) / (d_rel / 3 + 30), 15.0f, 30.0f) * 2.35;
+  //float sz = std::clamp((25 * 30) / (d_rel / 3 + 30), 15.0f, 30.0f) * 2.35;
   float x = std::clamp((float)vd.x(), 0.f, width() - sz / 2);
   float y = std::fmin(height() - sz * .6, (float)vd.y());
 
-  float g_xo = sz / 5;
-  float g_yo = sz / 10;
+  //float g_xo = sz / 5;
+  //float g_yo = sz / 10;
 
   //QPointF glow[] = {{x + (sz * 1.35) + g_xo, y + sz + g_yo}, {x, y - g_yo}, {x - (sz * 1.35) - g_xo, y + sz + g_yo}};
 
   painter.setCompositionMode(QPainter::CompositionMode_Plus);
   painter.setBrush(QColor(0, 255, 0, 255));
   float ww = 100 , hh = 100;
-  painter.drawRect(x - ww/2, y - g_yo - hh, ww, hh);
+  painter.drawRect(x - ww/2, y /*- g_yo*/ - hh, ww, hh);
   painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
 }
