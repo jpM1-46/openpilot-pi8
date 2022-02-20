@@ -583,6 +583,9 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
   }
 }
 
+void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd , int num , size_t leads_num) {
+}
+
 void NvgWindow::paintGL() {
   CameraViewWidget::paintGL();
 
