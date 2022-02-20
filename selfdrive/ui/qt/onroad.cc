@@ -608,10 +608,10 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   //QPointF glow[] = {{x + (sz * 1.35) + g_xo, y + sz + g_yo}, {x, y - g_yo}, {x - (sz * 1.35) - g_xo, y + sz + g_yo}};
 
   painter.setCompositionMode(QPainter::CompositionMode_Plus);
-  p.setBrush(QColor(0, 255, 0, 255);
+  painter.setBrush(QColor(0, 255, 0, 255);
   float ww = 100 , hh = 100;
-  p.drawRect(x - ww/2, y - g_yo - hh, ww, hh);
-  p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+  painter.drawRect(x - ww/2, y - g_yo - hh, ww, hh);
+  painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
 }
 
