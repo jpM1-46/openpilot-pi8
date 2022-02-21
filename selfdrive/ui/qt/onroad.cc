@@ -616,8 +616,8 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   if(d < 1){
     d = 1;
   }
-  ww = ww * 2 / d;
-  hh = hh * 2 / d;
+  ww = ww * 2 * 5 / d;
+  hh = hh * 2 * 5 / d;
   QRect r = QRect(x - ww/2, y /*- g_yo*/ - hh, ww, hh);
 
   painter.drawRect(r);
