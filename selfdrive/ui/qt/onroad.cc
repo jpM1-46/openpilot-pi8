@@ -616,6 +616,18 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   if(d < 1){
     d = 1;
   }
+
+  //動きに緩衝処理。
+  leadcar_lockon[num].x = leadcar_lockon[num].x + (x - leadcar_lockon[num].x) / 4;
+  leadcar_lockon[num].y = leadcar_lockon[num].y + (x - leadcar_lockon[num].y) / 4;
+  leadcar_lockon[num].d = leadcar_lockon[num].d + (x - leadcar_lockon[num].d) / 4;
+  x = leadcar_lockon[num].x;
+  y = leadcar_lockon[num].y;
+  d = leadcar_lockon[num].d;
+  if(d < 1){
+    d = 1;
+  }
+
   ww = ww * 2 * 5 / d;
   hh = hh * 2 * 5 / d;
   QRect r = QRect(x - ww/2, y /*- g_yo*/ - hh, ww, hh);
@@ -623,7 +635,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   painter.drawRect(r);
 
   configFont(painter, "Open Sans", 38, "SemiBold");
-  if(num == 1){
+  if(num == 0){
     painter.drawText(r, Qt::AlignTop | Qt::AlignLeft, " " + QString::number(num+1));
     painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number(lead_data.getProb(),'f',2) + " ");
   } else {
