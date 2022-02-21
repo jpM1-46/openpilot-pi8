@@ -611,7 +611,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   //p.setPen(QColor(0, 255, 0, 255));
   painter.setPen(QPen(QColor(0, 245, 0, 245), 2));
   painter.setBrush(QColor(0, 0, 0, 0));
-  float ww = 350 , hh = 300;
+  float ww = 300 , hh = 350;
   float d = d_rel; //距離をロックターケットの大きさに反映させる。
   if(d < 1){
     d = 1;
@@ -628,7 +628,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     d = 1;
   }
 
-  float dh = 30;
+  float dh = 50;
 
   ww = ww * 2 * 5 / d;
   hh = hh * 2 * 5 / d;
@@ -669,7 +669,7 @@ void NvgWindow::paintGL() {
         drawLead(painter, leads[1], s->scene.lead_vertices[1] , 1 , leads_num);
       }
       for(size_t i=0; i<leads_num && i < LeadcarLockon_MAX; i++){
-        if(leads[i].getProb() > .05){
+        if(leads[i].getProb() > .01){
           drawLockon(painter, leads[i], s->scene.lead_vertices[i] , i , leads_num);
         }
       }
