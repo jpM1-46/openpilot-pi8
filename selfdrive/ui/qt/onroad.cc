@@ -618,9 +618,9 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   }
 
   //動きに緩衝処理。
-  leadcar_lockon[num].x = leadcar_lockon[num].x + (x - leadcar_lockon[num].x) / 4;
-  leadcar_lockon[num].y = leadcar_lockon[num].y + (y - leadcar_lockon[num].y) / 4;
-  leadcar_lockon[num].d = leadcar_lockon[num].d + (d - leadcar_lockon[num].d) / 4;
+  leadcar_lockon[num].x = leadcar_lockon[num].x + (x - leadcar_lockon[num].x) / 6;
+  leadcar_lockon[num].y = leadcar_lockon[num].y + (y - leadcar_lockon[num].y) / 6;
+  leadcar_lockon[num].d = leadcar_lockon[num].d + (d - leadcar_lockon[num].d) / 6;
   x = leadcar_lockon[num].x;
   y = leadcar_lockon[num].y;
   d = leadcar_lockon[num].d;
@@ -638,14 +638,20 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
 
   configFont(painter, "Open Sans", 38, "SemiBold");
   if(num == 0){
+    painter.drawLine(r.right(),r.center().r.center().y() , width() , 0);
+
     painter.drawText(r, Qt::AlignTop | Qt::AlignLeft, " " + QString::number(num+1));
-    if(ww >= 70){
-      painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number(lead_data.getProb(),'f',2) + " ");
+    if(ww >= 100){
+      painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100) + " ");
     }
   } else {
-    painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
-    if(ww >= 70){
-      painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number(lead_data.getProb(),'f',2) + " ");
+    painter.drawLine(r.left(),r.center().r.center().y() , 0 , 0);
+
+    if(ww >= 60){
+      painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
+    }
+    if(ww >= 100){
+      painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + " ");
     }
   }
   painter.setPen(Qt::NoPen);
