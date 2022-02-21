@@ -619,7 +619,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
 
   //動きに緩衝処理。
   leadcar_lockon[num].x = leadcar_lockon[num].x + (x - leadcar_lockon[num].x) / 4;
-  leadcar_lockon[num].y = leadcar_lockon[num].y + (x - leadcar_lockon[num].y) / 4;
+  leadcar_lockon[num].y = leadcar_lockon[num].y + (y - leadcar_lockon[num].y) / 4;
   leadcar_lockon[num].d = leadcar_lockon[num].d + (x - leadcar_lockon[num].d) / 4;
   x = leadcar_lockon[num].x;
   y = leadcar_lockon[num].y;
