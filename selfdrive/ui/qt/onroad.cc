@@ -634,18 +634,26 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   hh = hh * 2 * 5 / d;
   QRect r = QRect(x - ww/2, y /*- g_yo*/ - hh - dh, ww, hh);
 
+  painter.setPen(QPen(QColor(0, 245, 0, 245), 2));
   painter.drawRect(r);
 
+  painter.setPen(QPen(QColor(0, 245, 0, 245), 1));
   configFont(painter, "Open Sans", 38, "SemiBold");
   if(num == 0){
-    painter.drawLine(r.right(),r.center().r.center().y() , width() , 0);
+    painter.drawLine(r.right(),r.center().center().y() , width() , 0);
 
     painter.drawText(r, Qt::AlignTop | Qt::AlignLeft, " " + QString::number(num+1));
     if(ww >= 100){
-      painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100) + " ");
+      painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + " ");
     }
   } else {
-    painter.drawLine(r.left(),r.center().r.center().y() , 0 , 0);
+    if(num == 1){
+      painter.drawLine(r.left(),r.center().center().y() , 0 , 0);
+    } else if(num == 2){
+      painter.drawLine(r.right(),r.center().center().y() , width() , height());
+    } else {
+      painter.drawLine(r.left(),r.center().center().y() , 0 , height());
+    }
 
     if(ww >= 60){
       painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
