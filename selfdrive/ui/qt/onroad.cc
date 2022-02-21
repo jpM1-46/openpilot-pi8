@@ -609,9 +609,9 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
 
   painter.setCompositionMode(QPainter::CompositionMode_Plus);
   //p.setPen(QColor(0, 255, 0, 255));
-  painter.setPen(QPen(QColor(0, 255, 0, 255), 2));
+  painter.setPen(QPen(QColor(0, 245, 0, 245), 2));
   painter.setBrush(QColor(0, 0, 0, 0));
-  float ww = 200 , hh = 200;
+  float ww = 350 , hh = 300;
   float d = d_rel; //距離をロックターケットの大きさに反映させる。
   if(d < 1){
     d = 1;
@@ -628,9 +628,11 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     d = 1;
   }
 
+  float dh = 30;
+
   ww = ww * 2 * 5 / d;
   hh = hh * 2 * 5 / d;
-  QRect r = QRect(x - ww/2, y /*- g_yo*/ - hh, ww, hh);
+  QRect r = QRect(x - ww/2, y /*- g_yo*/ - hh - dh, ww, hh);
 
   painter.drawRect(r);
 
@@ -660,14 +662,16 @@ void NvgWindow::paintGL() {
     if (s->scene.longitudinal_control) {
       auto leads = (*s->sm)["modelV2"].getModelV2().getLeadsV3();
       size_t leads_num = leads.size();
-      for(size_t i=0; i<leads_num && i < LeadcarLockon_MAX; i++){
-        drawLockon(painter, leads[i], s->scene.lead_vertices[i] , i , leads_num);
-      }
       if (leads[0].getProb() > .5) {
         drawLead(painter, leads[0], s->scene.lead_vertices[0] , 0 , leads_num);
       }
       if (leads[1].getProb() > .5 && (std::abs(leads[1].getX()[0] - leads[0].getX()[0]) > 3.0)) {
         drawLead(painter, leads[1], s->scene.lead_vertices[1] , 1 , leads_num);
+      }
+      for(size_t i=0; i<leads_num && i < LeadcarLockon_MAX; i++){
+        if(leads[i].getProb() > .05){
+          drawLockon(painter, leads[i], s->scene.lead_vertices[i] , i , leads_num);
+        }
       }
     }
   }
