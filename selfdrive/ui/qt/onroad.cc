@@ -568,7 +568,7 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
     //float dist = d_rel; //lead_data.getT()[0];
     QString dist = QString::number(d_rel,'f',1) + "m";
     int str_w = 200;
-    dist += "<" + QString::number(leads_num) + ">";
+//    dist += "<" + QString::number(leads_num) + ">";
 //   int str_w = 600; //200;
 //    dist += QString::number(v_rel,'f',1) + "v";
 //    dist += QString::number(t_rel,'f',1) + "t";
@@ -611,7 +611,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   //p.setPen(QColor(0, 255, 0, 255));
   painter.setPen(QPen(QColor(0, 245, 0, 245), 2));
   painter.setBrush(QColor(0, 0, 0, 0));
-  float ww = 300 , hh = 350;
+  float ww = 300 , hh = 300;
   float d = d_rel; //距離をロックターケットの大きさに反映させる。
   if(d < 1){
     d = 1;
@@ -639,10 +639,14 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   configFont(painter, "Open Sans", 38, "SemiBold");
   if(num == 0){
     painter.drawText(r, Qt::AlignTop | Qt::AlignLeft, " " + QString::number(num+1));
-    painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number(lead_data.getProb(),'f',2) + " ");
+    if(ww >= 70){
+      painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number(lead_data.getProb(),'f',2) + " ");
+    }
   } else {
     painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
-    painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number(lead_data.getProb(),'f',2) + " ");
+    if(ww >= 70){
+      painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number(lead_data.getProb(),'f',2) + " ");
+    }
   }
   painter.setPen(Qt::NoPen);
   painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
