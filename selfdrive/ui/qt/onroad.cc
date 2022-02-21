@@ -612,7 +612,14 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   painter.setPen(QPen(QColor(0, 255, 0, 255), 2));
   painter.setBrush(QColor(0, 0, 0, 0));
   float ww = 200 , hh = 200;
-  painter.drawRect(x - ww/2, y /*- g_yo*/ - hh, ww, hh);
+  QRect r = QRect(x - ww/2, y /*- g_yo*/ - hh, ww, hh);
+
+  painter.drawRect(r);
+
+  configFont(painter, "Open Sans", 38, "SemiBold");
+  painter.drawText(r, Qt::AlignTop | Qt::AlignLeft, QString::number(num+1));
+  painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number(lead_data.getProb(),'f',2));
+
   painter.setPen(Qt::NoPen);
   painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 }
