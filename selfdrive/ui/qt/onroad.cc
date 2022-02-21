@@ -640,26 +640,35 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   painter.setPen(QPen(QColor(0, 245, 0, 245), 1));
   configFont(painter, "Open Sans", 38, "SemiBold");
   if(num == 0){
-    painter.drawLine(r.right(),r.center().y() , width() , 0);
-
+    if(leadcar_lockon[0].x > leadcar_lockon[1].x){
+      painter.drawLine(r.right(),r.top() , width() , 0);
+    } else {
+      painter.drawLine(r.left(),r.top() , 0 , 0);
+    }
     painter.drawText(r, Qt::AlignTop | Qt::AlignLeft, " " + QString::number(num+1));
-    if(ww >= 100){
-      painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + " ");
+    if(ww >= 80){
+      painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
     }
   } else {
     if(num == 1){
-      painter.drawLine(r.left(),r.center().y() , 0 , 0);
+      if(leadcar_lockon[0].x > leadcar_lockon[1].x){
+        painter.drawLine(r.left(),r.top() , 0 , 0);
+      } else {
+        painter.drawLine(r.right(),r.top() , width() , 0);
+      }
     } else if(num == 2){
-      painter.drawLine(r.right(),r.center().y() , width() , height());
+      //事実上ない。動かない0,0に居るみたい？
+      //painter.drawLine(r.right(),r.center().y() , width() , height());
     } else {
-      painter.drawLine(r.left(),r.center().y() , 0 , height());
+      //事実上ない
+      //painter.drawLine(r.left(),r.center().y() , 0 , height());
     }
 
-    if(ww >= 60){
+    if(ww >= 80){
       painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
     }
-    if(ww >= 100){
-      painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + " ");
+    if(ww >= 80){
+      painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
     }
   }
   painter.setPen(Qt::NoPen);
