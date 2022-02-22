@@ -678,9 +678,9 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
 
     if(ww >= 80){
       //painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
-      painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(lead1.getY()[0],'f',1) + "m");
+      painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(lead0.getY()[0] - lead1.getY()[0],'f',1) + "m");
     }
-    if(ww >= 80){
+    if(ww >= 160 /*80*/){
       painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
     }
   }
