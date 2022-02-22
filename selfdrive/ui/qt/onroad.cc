@@ -589,7 +589,7 @@ struct LeadcarLockon {
 #define LeadcarLockon_MAX 5
 LeadcarLockon leadcar_lockon[LeadcarLockon_MAX];
 
-void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd , int num , size_t leads_num , cereal::ModelDataV2::LeadDataV3::Reader &lead0 , cereal::ModelDataV2::LeadDataV3::Reader &lead1) {
+void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd , int num , size_t leads_num , const cereal::ModelDataV2::LeadDataV3::Reader &lead0 , const cereal::ModelDataV2::LeadDataV3::Reader &lead1) {
   //const float speedBuff = 10.;
   //const float leadBuff = 40.;
   const float d_rel = lead_data.getX()[0];
