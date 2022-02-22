@@ -658,9 +658,17 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       }
 
       //邪魔な前右寄りを走るバイクを認識したい。
+#if 0
+      float y0 = lead0.getY()[0];
+      float y1 = lead1.getY()[0];
+#else
+      //y?ってわかりにくいな。横方向なんだが。getYは使えなさそうだし。
+      float y0 = leadcar_lockon[0].x * leadcar_lockon[0].d; //こうなったら画面座標から逆算。
+      float y1 = leadcar_lockon[1].x * leadcar_lockon[1].d;
+#endif
       if(num == 1
         //&& lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
-        && lead0.getY()[0] > lead1.getY()[0] //lead1がlead0より左
+        && y0 > y1 //lead1がlead0より左
         //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
       ){
         painter.setPen(QPen(QColor(245, 0, 0, 245), 2));
@@ -678,7 +686,8 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
 
     if(ww >= 80){
       //painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
-      painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(lead0.getY()[0] - lead1.getY()[0],'f',1) + "m");
+      float dy = y0 - y1;
+      painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(dy,'f',1) + "m");
     }
     if(ww >= 160 /*80*/){
       painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
