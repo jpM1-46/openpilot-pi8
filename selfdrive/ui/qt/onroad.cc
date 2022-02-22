@@ -676,6 +676,10 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
         //painter.setPen(QPen(QColor(0, 245, 0, 245), 1)); //文字を後で書くために色を再設定。->文字は赤でもいいや
       }
 
+      if(ww >= 80){
+        float dy = y0 - y1;
+        painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(dy,'f',1) + "m");
+      }
     } else if(num == 2){
       //事実上ない。動かない0,0に居るみたい？
       //painter.drawLine(r.right(),r.center().y() , width() , height());
@@ -685,9 +689,8 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     }
 
     if(ww >= 80){
+      //ここではy0,y1を参照できない。
       //painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
-      float dy = y0 - y1;
-      painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(dy,'f',1) + "m");
     }
     if(ww >= 160 /*80*/){
       painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
