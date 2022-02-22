@@ -653,9 +653,6 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     if(num == 1){
       if(leadcar_lockon[0].x > leadcar_lockon[1].x){
         painter.drawLine(r.left(),r.top() , 0 , 0);
-
-        painter.drawEllipse(r);
-
       } else {
         painter.drawLine(r.right(),r.top() , width() , 0);
       }
@@ -668,7 +665,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       ){
         painter.setPen(QPen(QColor(245, 0, 0, 245), 2));
         painter.drawEllipse(r);
-        painter.setPen(QPen(QColor(0, 245, 0, 245), 1)); //文字を後で書くために色を再設定。
+        //painter.setPen(QPen(QColor(0, 245, 0, 245), 1)); //文字を後で書くために色を再設定。->文字は赤でもいいや
       }
 
     } else if(num == 2){
@@ -680,7 +677,8 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     }
 
     if(ww >= 80){
-      painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
+      //painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
+      painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(lead1.getY()[0],'f',1) + "m");
     }
     if(ww >= 80){
       painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
