@@ -589,7 +589,7 @@ struct LeadcarLockon {
 #define LeadcarLockon_MAX 5
 LeadcarLockon leadcar_lockon[LeadcarLockon_MAX];
 
-void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd , int num , size_t leads_num) {
+void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd , int num , size_t leads_num , cereal::ModelDataV2::LeadDataV3::Reader &lead0 , cereal::ModelDataV2::LeadDataV3::Reader &lead1) {
   //const float speedBuff = 10.;
   //const float leadBuff = 40.;
   const float d_rel = lead_data.getX()[0];
@@ -653,9 +653,24 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     if(num == 1){
       if(leadcar_lockon[0].x > leadcar_lockon[1].x){
         painter.drawLine(r.left(),r.top() , 0 , 0);
+
+        painter.drawEllipse(r);
+
       } else {
         painter.drawLine(r.right(),r.top() , width() , 0);
       }
+
+      //邪魔な前右寄りを走るバイクを認識したい。
+      if(num == 1
+        //&& lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
+        //&& lead0.getY()[0] > lead1.getY()[0] //lead1がlead0より左
+        //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
+      ){
+        painter.setPen(QPen(QColor(245, 0, 0, 245), 2));
+        painter.drawEllipse(r);
+        painter.setPen(QPen(QColor(0, 245, 0, 245), 1)); //文字を後で書くために色を再設定。
+      }
+
     } else if(num == 2){
       //事実上ない。動かない0,0に居るみたい？
       //painter.drawLine(r.right(),r.center().y() , width() , height());
@@ -697,7 +712,7 @@ void NvgWindow::paintGL() {
       }
       for(size_t i=0; i<leads_num && i < LeadcarLockon_MAX; i++){
         if(leads[i].getProb() > .01){
-          drawLockon(painter, leads[i], s->scene.lead_vertices[i] , i , leads_num);
+          drawLockon(painter, leads[i], s->scene.lead_vertices[i] , i , leads_num , leads[0] , leads[1]);
         }
       }
     }
