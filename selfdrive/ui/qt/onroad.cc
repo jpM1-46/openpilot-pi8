@@ -663,7 +663,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       //邪魔な前右寄りを走るバイクを認識したい。
       if(num == 1
         //&& lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
-        //&& lead0.getY()[0] > lead1.getY()[0] //lead1がlead0より左
+        && lead0.getY()[0] > lead1.getY()[0] //lead1がlead0より左
         //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
       ){
         painter.setPen(QPen(QColor(245, 0, 0, 245), 2));
