@@ -671,7 +671,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
         && y0 > y1 //lead1がlead0より左
         //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
       ){
-        painter.setPen(QPen(QColor(245, 0, 0, 245), 2));
+        painter.setPen(QPen(QColor(245, 0, 0, 245), 4));
         painter.drawEllipse(r);
         //painter.setPen(QPen(QColor(0, 245, 0, 245), 1)); //文字を後で書くために色を再設定。->文字は赤でもいいや
       }
