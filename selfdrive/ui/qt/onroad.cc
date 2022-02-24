@@ -637,7 +637,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   painter.setPen(QPen(QColor(0, 245, 0, 245), 2));
   painter.drawRect(r);
 
-  painter.setPen(QPen(QColor(0, 245, 0, 245), 1));
+  painter.setPen(QPen(QColor(0, 245, 0, 245), 2));
   configFont(painter, "Open Sans", 38, "SemiBold");
   if(num == 0){
     if(leadcar_lockon[0].x > leadcar_lockon[1].x){
@@ -678,7 +678,8 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
 
       if(ww >= 80){
         float dy = y0 - y1;
-        painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(dy,'f',1) + "m");
+        //painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(dy,'f',1) + "m");
+        painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(dy,'f',1));
       }
     } else if(num == 2){
       //事実上ない。動かない0,0に居るみたい？
