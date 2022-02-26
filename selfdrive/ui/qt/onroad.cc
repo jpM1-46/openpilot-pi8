@@ -596,7 +596,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   //const float v_rel = lead_data.getV()[0];
   //const float t_rel = lead_data.getT()[0];
   //const float y_rel = lead_data.getY()[0];
-  //const float a_rel = lead_data.getA()[0];
+  const float a_rel = lead_data.getA()[0];
 
   float sz = std::clamp((25 * 30) / (d_rel / 3 + 30), 15.0f, 30.0f) * 2.35;
   float x = std::clamp((float)vd.x(), 0.f, width() - sz / 2);
@@ -609,7 +609,16 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
 
   painter.setCompositionMode(QPainter::CompositionMode_Plus);
   //p.setPen(QColor(0, 255, 0, 255));
-  painter.setPen(QPen(QColor(0, 245, 0, 245), 2));
+
+  float prob_alpha = lead_data.getProb();
+  if(prob_alpha < 0){
+    prob_alpha = 0;
+  } else if(prob_alpha > 1.0){
+    prob_alpha = 1.0;
+  }
+  prob_alpha *= 245;
+
+  painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
   painter.setBrush(QColor(0, 0, 0, 0));
   float ww = 300 , hh = 300;
   float d = d_rel; //距離をロックターケットの大きさに反映させる。
@@ -634,10 +643,10 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   hh = hh * 2 * 5 / d;
   QRect r = QRect(x - ww/2, y /*- g_yo*/ - hh - dh, ww, hh);
 
-  painter.setPen(QPen(QColor(0, 245, 0, 245), 2));
+  painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
   painter.drawRect(r);
 
-  painter.setPen(QPen(QColor(0, 245, 0, 245), 2));
+  painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
   configFont(painter, "Open Sans", 38, "SemiBold");
   if(num == 0){
     if(leadcar_lockon[0].x > leadcar_lockon[1].x){
@@ -670,11 +679,12 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
         //&& lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
         //&& y0 > y1 //lead1がlead0より左
         && std::abs(y0 - y1) > 300 //大きく横にずれた
+        // ||ほかにv_relやa_relで前方の急減速を表示したり（num==0に表示すべき？）
         //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
       ){
-        painter.setPen(QPen(QColor(245, 0, 0, 245), 4));
+        painter.setPen(QPen(QColor(245, 0, 0, prob_alpha), 4));
         painter.drawEllipse(r);
-        //painter.setPen(QPen(QColor(0, 245, 0, 245), 1)); //文字を後で書くために色を再設定。->文字は赤でもいいや
+        //painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 1)); //文字を後で書くために色を再設定。->文字は赤でもいいや
       }
 
       if(ww >= 80){
@@ -695,7 +705,8 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       //painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
     }
     if(ww >= 160 /*80*/){
-      painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
+      //painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
+      painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number(a_rel,'f',1) + "a");
     }
   }
   painter.setPen(Qt::NoPen);
