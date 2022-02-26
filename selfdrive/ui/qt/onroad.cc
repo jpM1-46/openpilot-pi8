@@ -668,7 +668,8 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
 #endif
       if(num == 1
         //&& lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
-        && y0 > y1 //lead1がlead0より左
+        //&& y0 > y1 //lead1がlead0より左
+        && std::abs(y0 - y1) > 300 //大きく横にずれた
         //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
       ){
         painter.setPen(QPen(QColor(245, 0, 0, 245), 4));
@@ -722,7 +723,7 @@ void NvgWindow::paintGL() {
         drawLead(painter, leads[1], s->scene.lead_vertices[1] , 1 , leads_num);
       }
       for(size_t i=0; i<leads_num && i < LeadcarLockon_MAX; i++){
-        if(leads[i].getProb() > .01){
+        if(leads[i].getProb() > .2){ //信用度20%以上で表示。調整中。
           drawLockon(painter, leads[i], s->scene.lead_vertices[i] , i , leads_num , leads[0] , leads[1]);
         }
       }
