@@ -652,7 +652,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
   configFont(painter, "Open Sans", 38, "SemiBold");
   if(num == 0){
-    if(leadcar_lockon[0].x > leadcar_lockon[1].x -0.01){ //多少逆転しても許容する
+    if(leadcar_lockon[0].x > leadcar_lockon[1].x -0.1){ //多少逆転しても許容する
       painter.drawLine(r.right(),r.top() , width() , 0);
     } else {
       painter.drawLine(r.left(),r.top() , 0 , 0);
@@ -689,7 +689,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     }
   } else {
     if(num == 1){
-      if(leadcar_lockon[0].x > leadcar_lockon[1].x -0.01){ //多少逆転しても許容する
+      if(leadcar_lockon[0].x > leadcar_lockon[1].x -0.1){ //多少逆転しても許容する
         painter.drawLine(r.left(),r.top() , 0 , 0);
       } else {
         painter.drawLine(r.right(),r.top() , width() , 0);
