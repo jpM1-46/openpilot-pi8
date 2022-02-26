@@ -649,18 +649,44 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
   configFont(painter, "Open Sans", 38, "SemiBold");
   if(num == 0){
-    if(leadcar_lockon[0].x > leadcar_lockon[1].x){
+    if(leadcar_lockon[0].x > leadcar_lockon[1].x -0.01){ //多少逆転しても許容する
       painter.drawLine(r.right(),r.top() , width() , 0);
     } else {
       painter.drawLine(r.left(),r.top() , 0 , 0);
     }
     painter.drawText(r, Qt::AlignTop | Qt::AlignLeft, " " + QString::number(num+1));
     if(ww >= 80){
-      painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
+      //painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
+
+      //num==0のロックオンの右端20ドットくらいをa_rel数値メーターとする。
+      painter.setPen(Qt::NoPen);
+      float wwa = ww * 0.2;
+      if(wwa < 20){
+        wwa = 20;
+      }
+      if(wwa > ww){
+        wwa = ww;
+      }
+
+      float hha = 0;
+      if(a_rel > 0){
+        hha = 1 - 0.1 / a_rel;
+        painter.setBrush(QColor(0, 245, 0, prob_alpha));
+      }
+      if(a_rel < 0){
+        hha = 1 + 0.1 / a_rel;
+        painter.setBrush(QColor(245, 0, 0, prob_alpha));
+      }
+      if(hha < 0){
+        hha = 0;
+      }
+      hha = hha * hh;
+      QRect ra = QRect(x - ww/2 + (ww - wwa), y /*- g_yo*/ - hh - dh + (hh-hha), wwa, hha);
+      painter.drawRect(ra);
     }
   } else {
     if(num == 1){
-      if(leadcar_lockon[0].x > leadcar_lockon[1].x){
+      if(leadcar_lockon[0].x > leadcar_lockon[1].x -0.01){ //多少逆転しても許容する
         painter.drawLine(r.left(),r.top() , 0 , 0);
       } else {
         painter.drawLine(r.right(),r.top() , width() , 0);
@@ -679,18 +705,18 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
         //&& lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
         //&& y0 > y1 //lead1がlead0より左
         && std::abs(y0 - y1) > 300 //大きく横にずれた
-        // ||ほかにv_relやa_relで前方の急減速を表示したり（num==0に表示すべき？）
+        // ||ほかにv_relやa_relで前方の急減速を表示したり（num==0に表示してみた）
         //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
       ){
         painter.setPen(QPen(QColor(245, 0, 0, prob_alpha), 4));
-        painter.drawEllipse(r);
+        painter.drawEllipse(r); //縁を描く
         //painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 1)); //文字を後で書くために色を再設定。->文字は赤でもいいや
       }
 
       if(ww >= 80){
         float dy = y0 - y1;
         //painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(dy,'f',1) + "m");
-        painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(dy,'f',1));
+        //painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(dy,'f',1));
       }
     } else if(num == 2){
       //事実上ない。動かない0,0に居るみたい？
@@ -702,11 +728,11 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
 
     if(ww >= 80){
       //ここではy0,y1を参照できない。
-      //painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
+      painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(num+1));
     }
     if(ww >= 160 /*80*/){
       //painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
-      painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number(a_rel,'f',1) + "a");
+      //painter.drawText(r, Qt::AlignBottom | Qt::AlignRight, QString::number(a_rel,'f',1) + "a");
     }
   }
   painter.setPen(Qt::NoPen);
