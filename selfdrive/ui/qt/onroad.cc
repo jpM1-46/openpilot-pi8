@@ -674,7 +674,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       float hha = 0;
       if(a_rel > 0){
         hha = 1 - 0.1 / a_rel;
-        painter.setBrush(QColor(0, 245, 0, prob_alpha));
+        painter.setBrush(QColor(0, 245, 0, prob_alpha*0.9));
       }
       if(a_rel < 0){
         hha = 1 + 0.1 / a_rel;
