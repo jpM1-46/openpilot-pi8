@@ -584,7 +584,7 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
 }
 
 struct LeadcarLockon {
-  float x,y,d;
+  float x,y,d,a;
 };
 #define LeadcarLockon_MAX 5
 LeadcarLockon leadcar_lockon[LeadcarLockon_MAX];
@@ -637,6 +637,9 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     d = 1;
   }
 
+  leadcar_lockon[num].a = leadcar_lockon[num].a + (a_rel - leadcar_lockon[num].a) / 10;
+  a_rel = leadcar_lockon[num].a;
+
   float dh = 50;
 
   ww = ww * 2 * 5 / d;
@@ -655,7 +658,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       painter.drawLine(r.left(),r.top() , 0 , 0);
     }
     painter.drawText(r, Qt::AlignTop | Qt::AlignLeft, " " + QString::number(num+1));
-    if(ww >= 80){
+    if(ww >= 40){
       //painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
 
       //num==0のロックオンの右端20ドットくらいをa_rel数値メーターとする。
