@@ -663,9 +663,11 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
 
       //num==0のロックオンの右端20ドットくらいをa_rel数値メーターとする。
       painter.setPen(Qt::NoPen);
-      float wwa = ww * 0.2;
-      if(wwa < 20){
+      float wwa = ww * 0.15;
+      if(wwa > 20){
         wwa = 20;
+      } else if(wwa < 10){
+        wwa = 10;
       }
       if(wwa > ww){
         wwa = ww;
