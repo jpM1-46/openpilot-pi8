@@ -653,17 +653,18 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   configFont(painter, "Open Sans", 38, "SemiBold");
   if(num == 0){
     if(leadcar_lockon[0].x > leadcar_lockon[1].x){
-      leadcar_lockon[num].lxt = leadcar_lockon[num].lxt + (r.right() - leadcar_lockon[num].lxt) / 10;
+      leadcar_lockon[num].lxt = leadcar_lockon[num].lxt + (r.right() - leadcar_lockon[num].lxt) / 20;
       leadcar_lockon[num].lxf = leadcar_lockon[num].lxf + (width() - leadcar_lockon[num].lxf) / 20;
       //painter.drawLine(r.right(),r.top() , width() , 0);
     } else {
-      leadcar_lockon[num].lxt = leadcar_lockon[num].lxt + (r.left() - leadcar_lockon[num].lxt) / 10;
+      leadcar_lockon[num].lxt = leadcar_lockon[num].lxt + (r.left() - leadcar_lockon[num].lxt) / 20;
       leadcar_lockon[num].lxf = leadcar_lockon[num].lxf + (0 - leadcar_lockon[num].lxf) / 20;
       //painter.drawLine(r.left(),r.top() , 0 , 0);
     }
-    painter.drawLine(leadcar_lockon[num].lxt,r.top() , leadcar_lockon[num].lxf , 0);
-    
     painter.drawText(r, Qt::AlignTop | Qt::AlignLeft, " " + QString::number(num+1));
+
+    painter.setPen(QPen(QColor(245, 245, 0, prob_alpha), 2));
+    painter.drawLine(leadcar_lockon[num].lxt,r.top() , leadcar_lockon[num].lxf , 0);
     if(ww >= 40){
       //painter.drawText(r, Qt::AlignTop | Qt::AlignRight, QString::number((int)(lead_data.getProb()*100)) + "％");
 
@@ -697,12 +698,12 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     }
   } else {
     if(num == 1){
-      if(leadcar_lockon[0].x > leadcar_lockon[1].x){ //多少逆転しても許容する
-        leadcar_lockon[num].lxt = leadcar_lockon[num].lxt + (r.left() - leadcar_lockon[num].lxt) / 10;
+      if(leadcar_lockon[0].x > leadcar_lockon[1].x - 0.5){ //多少逆転しても許容する
+        leadcar_lockon[num].lxt = leadcar_lockon[num].lxt + (r.left() - leadcar_lockon[num].lxt) / 20;
         leadcar_lockon[num].lxf = leadcar_lockon[num].lxf + (0 - leadcar_lockon[num].lxf) / 20;
         //painter.drawLine(r.left(),r.top() , 0 , 0);
       } else {
-        leadcar_lockon[num].lxt = leadcar_lockon[num].lxt + (r.right() - leadcar_lockon[num].lxt) / 10;
+        leadcar_lockon[num].lxt = leadcar_lockon[num].lxt + (r.right() - leadcar_lockon[num].lxt) / 20;
         leadcar_lockon[num].lxf = leadcar_lockon[num].lxf + (width() - leadcar_lockon[num].lxf) / 20;
         //painter.drawLine(r.right(),r.top() , width() , 0);
       }
