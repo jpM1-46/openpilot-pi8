@@ -721,15 +721,16 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     ){
       leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (40 - leadcar_lockon[num].lockOK) / 10;
       //float td = 40;
-      float td = leadcar_lockon[num].lockOK;
-      if(td >= 3){
-        painter.drawLine(r.center().x() , r.top() , r.center().x() , r.top() - td);
-        painter.drawLine(r.left() , r.center().y() , r.left() - td , r.center().y());
-        painter.drawLine(r.right() , r.center().y() , r.right() + td , r.center().y());
-        painter.drawLine(r.center().x() , r.bottom() , r.center().x() , r.bottom() + td);
-      }
     } else {
       leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (0 - leadcar_lockon[num].lockOK) / 10;
+    }
+    float td = leadcar_lockon[num].lockOK;
+    if(td >= 3){
+      painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 8));
+      painter.drawLine(r.center().x() , r.top() , r.center().x() , r.top() - td);
+      painter.drawLine(r.left() , r.center().y() , r.left() - td , r.center().y());
+      painter.drawLine(r.right() , r.center().y() , r.right() + td , r.center().y());
+      painter.drawLine(r.center().x() , r.bottom() , r.center().x() , r.bottom() + td);
     }
 
   } else {
