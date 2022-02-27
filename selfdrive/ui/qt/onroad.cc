@@ -584,7 +584,7 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
 }
 
 struct LeadcarLockon {
-  float x,y,d,a,lxt,lxf;
+  float x,y,d,a,lxt,lxf,lockOK;
 };
 #define LeadcarLockon_MAX 5
 LeadcarLockon leadcar_lockon[LeadcarLockon_MAX]; //この配列0番を推論1番枠と呼ぶことにする。
@@ -646,6 +646,15 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   hh = hh * 2 * 5 / d;
   QRect r = QRect(x - ww/2, y /*- g_yo*/ - hh - dh, ww, hh);
 
+#if 0
+  float y0 = lead0.getY()[0];
+  float y1 = lead1.getY()[0];
+#else
+  //y?ってわかりにくいな。横方向なんだが。getYは使えなさそうだし。
+  float y0 = leadcar_lockon[0].x * leadcar_lockon[0].d; //こうなったら画面座標から逆算。
+  float y1 = leadcar_lockon[1].x * leadcar_lockon[1].d;
+#endif
+
   configFont(painter, "Open Sans", 38, "SemiBold");
   if(num == 0){
     //推論1番
@@ -703,18 +712,30 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       QRect ra = QRect(x - ww/2 + (ww - wwa), y /*- g_yo*/ - hh - dh + (hh-hha), wwa, hha);
       painter.drawRect(ra);
     }
+
+    if(//lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
+        //y0 > y1 //lead1がlead0より左
+        std::abs(y0 - y1) > 300 //大きく横にずれた
+        // ||ほかにv_relやa_relで前方の急減速を表示したり（num==0に表示してみた）
+        //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
+    ){
+      leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (40 - leadcar_lockon[num].lockOK) / 10;
+      //float td = 40;
+      float td = leadcar_lockon[num].lockOK;
+      if(td >= 3){
+        painter.drawLine(r.center().x() , r.top() , r.center().x() , r.top() - td);
+        painter.drawLine(r.left() , r.center().y() , r.left() - td , r.center().y());
+        painter.drawLine(r.right() , r.center().y() , r.right() + td , r.center().y());
+        painter.drawLine(r.center().x() , r.bottom() , r.center().x() , r.bottom() + td);
+      }
+    } else {
+      leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (0 - leadcar_lockon[num].lockOK) / 10;
+    }
+
   } else {
     if(num == 1){
       //推論2番
       //邪魔な前右寄りを走るバイクを認識したい。
-#if 0
-      float y0 = lead0.getY()[0];
-      float y1 = lead1.getY()[0];
-#else
-      //y?ってわかりにくいな。横方向なんだが。getYは使えなさそうだし。
-      float y0 = leadcar_lockon[0].x * leadcar_lockon[0].d; //こうなったら画面座標から逆算。
-      float y1 = leadcar_lockon[1].x * leadcar_lockon[1].d;
-#endif
       if(//lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
         //y0 > y1 //lead1がlead0より左
         std::abs(y0 - y1) > 300 //大きく横にずれた
