@@ -719,10 +719,10 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
         // ||ほかにv_relやa_relで前方の急減速を表示したり（num==0に表示してみた）
         //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
     ){
-      leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (40 - leadcar_lockon[num].lockOK) / 10;
+      leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (40 - leadcar_lockon[num].lockOK) / 5;
       //float td = 40;
     } else {
-      leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (0 - leadcar_lockon[num].lockOK) / 10;
+      leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (0 - leadcar_lockon[num].lockOK) / 5;
     }
     float td = leadcar_lockon[num].lockOK;
     //d:10〜100->1〜3へ変換
@@ -734,7 +734,6 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       dd -= 10; //dd=0〜90
       dd /= (90.0/2); //dd=0〜2
       dd += 1; //dd=1〜3
-      
       td /= dd;
 
       float tlw = 8;
