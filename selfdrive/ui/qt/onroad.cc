@@ -725,7 +725,17 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (0 - leadcar_lockon[num].lockOK) / 10;
     }
     float td = leadcar_lockon[num].lockOK;
+    //d:10〜100->1〜3へ変換
     if(td >= 3){
+      float dd = leadcar_lockon[num].d;
+      if(dd < 10){
+        dd = 10;
+      }
+      dd -= 10; //dd=0〜90
+      dd /= (90.0/2); //dd=0〜2
+      dd += 1; //dd=1〜3
+      td /= dd;
+
       float tlw = 8;
       float tlw_2 = tlw / 2;
       painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), tlw));
