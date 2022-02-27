@@ -149,7 +149,7 @@ class Planner:
       leadOne = sm['radarState'].leadOne
       d_rel = leadOne.dRel #前走者までの距離
       a_rel = leadOne.aRel #前走者の加速？　離れていっている時はプラス
-      if v_ego * 3.6 < d_rel / 0.98: #例、時速50kmの時前走車までの距離が50m以上離れている
+      if v_ego * 3.6 < d_rel / 0.98 and a_rel >= 0: #例、時速50kmの時前走車までの距離が50m以上離れている&&相手が減速していない
         if v_ego * 3.6 >= v_cruise_kph * 0.98: #ACC設定速度がすでに出ている。
           add_v_by_lead = True #前走車に追いつくための増速処理が有効
           v_cruise_kph *= 1.2 #ACC設定速度を２割増速
