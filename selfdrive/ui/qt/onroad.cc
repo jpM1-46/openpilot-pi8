@@ -734,6 +734,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       dd -= 10; //dd=0〜90
       dd /= (90.0/2); //dd=0〜2
       dd += 1; //dd=1〜3
+      
       td /= dd;
 
       float tlw = 8;
