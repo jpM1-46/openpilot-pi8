@@ -587,7 +587,7 @@ struct LeadcarLockon {
   float x,y,d,a,lxt,lxf;
 };
 #define LeadcarLockon_MAX 5
-LeadcarLockon leadcar_lockon[LeadcarLockon_MAX];
+LeadcarLockon leadcar_lockon[LeadcarLockon_MAX]; //この配列0番を推論1番枠と呼ぶことにする。
 
 void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd , int num , size_t leads_num , const cereal::ModelDataV2::LeadDataV3::Reader &lead0 , const cereal::ModelDataV2::LeadDataV3::Reader &lead1) {
   //const float speedBuff = 10.;
@@ -646,12 +646,13 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
   hh = hh * 2 * 5 / d;
   QRect r = QRect(x - ww/2, y /*- g_yo*/ - hh - dh, ww, hh);
 
-  painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
-  painter.drawRect(r);
-
-  painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
   configFont(painter, "Open Sans", 38, "SemiBold");
   if(num == 0){
+    //推論1番
+    painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
+    painter.drawRect(r);
+
+    //painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
     if(leadcar_lockon[0].x > leadcar_lockon[1].x - 20){
       leadcar_lockon[num].lxt = leadcar_lockon[num].lxt + (r.right() - leadcar_lockon[num].lxt) / 20;
       leadcar_lockon[num].lxf = leadcar_lockon[num].lxf + (width() - leadcar_lockon[num].lxf) / 20;
@@ -704,6 +705,32 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     }
   } else {
     if(num == 1){
+      //推論2番
+      //邪魔な前右寄りを走るバイクを認識したい。
+#if 0
+      float y0 = lead0.getY()[0];
+      float y1 = lead1.getY()[0];
+#else
+      //y?ってわかりにくいな。横方向なんだが。getYは使えなさそうだし。
+      float y0 = leadcar_lockon[0].x * leadcar_lockon[0].d; //こうなったら画面座標から逆算。
+      float y1 = leadcar_lockon[1].x * leadcar_lockon[1].d;
+#endif
+      if//lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
+        //y0 > y1 //lead1がlead0より左
+        std::abs(y0 - y1) > 300 //大きく横にずれた
+        // ||ほかにv_relやa_relで前方の急減速を表示したり（num==0に表示してみた）
+        //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
+      ){
+        //painter.setPen(QPen(QColor(245, 0, 0, prob_alpha), 4));
+        //painter.drawEllipse(r); //縁を描く
+        //painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 1)); //文字を後で書くために色を再設定。->文字は赤でもいいや
+
+        //円を（意味不明だから）書かないで、枠ごと赤くする。推論1が推論と別のものを捉えてるのを簡単に認識できる。
+        painter.setPen(QPen(QColor(245, 0, 0, prob_alpha), 2));
+      } else {
+        painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
+      }
+
       if(leadcar_lockon[0].x > leadcar_lockon[1].x - 20){ //多少逆転しても許容する
         leadcar_lockon[num].lxt = leadcar_lockon[num].lxt + (r.left() - leadcar_lockon[num].lxt) / 20;
         leadcar_lockon[num].lxf = leadcar_lockon[num].lxf + (0 - leadcar_lockon[num].lxf) / 20;
@@ -721,39 +748,26 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       }
       painter.drawLine(lxt,r.top() , leadcar_lockon[num].lxf , 0);
 
-      //邪魔な前右寄りを走るバイクを認識したい。
-#if 0
-      float y0 = lead0.getY()[0];
-      float y1 = lead1.getY()[0];
-#else
-      //y?ってわかりにくいな。横方向なんだが。getYは使えなさそうだし。
-      float y0 = leadcar_lockon[0].x * leadcar_lockon[0].d; //こうなったら画面座標から逆算。
-      float y1 = leadcar_lockon[1].x * leadcar_lockon[1].d;
-#endif
-      if(num == 1
-        //&& lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
-        //&& y0 > y1 //lead1がlead0より左
-        && std::abs(y0 - y1) > 300 //大きく横にずれた
-        // ||ほかにv_relやa_relで前方の急減速を表示したり（num==0に表示してみた）
-        //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
-      ){
-        painter.setPen(QPen(QColor(245, 0, 0, prob_alpha), 4));
-        painter.drawEllipse(r); //縁を描く
-        //painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 1)); //文字を後で書くために色を再設定。->文字は赤でもいいや
-      }
-
       if(ww >= 80){
         //float dy = y0 - y1;
         //painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(dy,'f',1) + "m");
         //painter.drawText(r, Qt::AlignBottom | Qt::AlignLeft, " " + QString::number(dy,'f',1));
       }
     } else if(num == 2){
+      //推論3番
       //事実上ない。動かない0,0に居るみたい？
+      painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
       //painter.drawLine(r.right(),r.center().y() , width() , height());
     } else {
-      //事実上ない
+      //推論4番以降。
+      //存在していない。
+      painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
       //painter.drawLine(r.left(),r.center().y() , 0 , height());
     }
+
+    painter.drawRect(r);
+
+    //painter.setPen(QPen(QColor(0, 245, 0, prob_alpha), 2));
 
     if(ww >= 80){
       //ここではy0,y1を参照できない。
