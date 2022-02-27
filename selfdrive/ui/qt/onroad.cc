@@ -715,7 +715,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       float y0 = leadcar_lockon[0].x * leadcar_lockon[0].d; //こうなったら画面座標から逆算。
       float y1 = leadcar_lockon[1].x * leadcar_lockon[1].d;
 #endif
-      if//lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
+      if(//lead0.getX()[0] > lead1.getX()[0] //lead1がlead0より後ろ
         //y0 > y1 //lead1がlead0より左
         std::abs(y0 - y1) > 300 //大きく横にずれた
         // ||ほかにv_relやa_relで前方の急減速を表示したり（num==0に表示してみた）
