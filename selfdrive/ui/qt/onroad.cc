@@ -668,7 +668,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
     if(lxt < r.left()){
       lxt = r.left();
     } else if(lxt > r.right()){
-      lxt > r.right();
+      lxt = r.right();
     }
     painter.drawLine(lxt,r.top() , leadcar_lockon[num].lxf , 0);
     if(ww >= 40){
@@ -717,7 +717,7 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
       if(lxt < r.left()){
         lxt = r.left();
       } else if(lxt > r.right()){
-        lxt > r.right();
+        lxt = r.right();
       }
       painter.drawLine(lxt,r.top() , leadcar_lockon[num].lxf , 0);
 
