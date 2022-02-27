@@ -576,9 +576,10 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
 //    dist += QString::number(a_rel,'f',1) + "a";
     configFont(painter, "Open Sans", 44, "SemiBold");
     painter.setPen(QColor(0x0, 0x0, 0x0 , 200)); //影
-    painter.drawText(QRect(x+2, y-50+2, str_w, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
+    float lock_indicator_dx = 2; //下向きの十字照準を避ける。
+    painter.drawText(QRect(x+2+lock_indicator_dx, y-50+2, str_w, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
     painter.setPen(QColor(0xff, 0xff, 0xff));
-    painter.drawText(QRect(x, y-50, str_w, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
+    painter.drawText(QRect(x+lock_indicator_dx, y-50, str_w, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
     painter.setPen(Qt::NoPen);
   }
 }
