@@ -152,7 +152,7 @@ class Planner:
       if v_ego * 3.6 * 0.8 < d_rel / 0.98 and a_rel >= 0: #例、時速50kmの時前走車までの距離が50m以上離れている&&相手が減速していない。×0.8はd_relの値と実際の距離感との調整。
         if v_ego * 3.6 >= v_cruise_kph * 0.98: #ACC設定速度がすでに出ている。
           add_v_by_lead = True #前走車に追いつくための増速処理が有効
-          v_cruise_kph *= 1.1 #ACC設定速度を1割増速
+          v_cruise_kph *= 1.15 #ACC設定速度を1.5割増速
           if v_cruise_kph > 100:
             v_cruise_kph = 100 #危ないのでひとまず時速100kmまで。
 
