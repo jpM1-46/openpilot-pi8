@@ -153,8 +153,8 @@ class Planner:
         if v_ego * 3.6 >= v_cruise_kph * 0.98: #ACC設定速度がすでに出ている。
           add_v_by_lead = True #前走車に追いつくための増速処理が有効
           v_cruise_kph *= 1.15 #ACC設定速度を1.5割増速
-          if v_cruise_kph > 100:
-            v_cruise_kph = 100 #危ないのでひとまず時速100kmまで。
+          if v_cruise_kph > 105:
+            v_cruise_kph = 105 #危ないのでひとまず時速105kmまで。
 
     steerAng = sm['carState'].steeringAngleDeg - handle_center
     orgSteerAng = steerAng

@@ -247,7 +247,24 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   float max_disp_k = 1.8;
   float max_disp_a = 50;
   QRect rc(bdr_s * 2, bdr_s * 1.5+y_ofs, 184*max_disp_k, 202*max_disp_k);
+#if 0
   p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
+#else
+  QString ms = QString(maxSpeed);
+  if(ms.length() > 1){
+    if(maxSpeed.mid(0,1) == ","){ //先頭カンマで加速
+      ms = maxSpeed.mid(1,maxSpeed.length()-1);
+      p.setPen(QPen(QColor(0, 0xff, 0, 200), 10)); //加速時は緑
+    } else if(maxSpeed.mid(maxSpeed.length()-1,1) == "."){ //末尾ピリオドで減速
+      ms = maxSpeed.mid(0,maxSpeed.length()-1);
+      p.setPen(QPen(QColor(0xff, 0, 0, 200), 10)); //減速時は赤
+    } else {
+      p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
+    }
+  } else {
+    p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
+  }
+#endif
   p.setBrush(QColor(0, 0, 0, 100));
   p.drawRoundedRect(rc, 20, 20);
   p.setPen(Qt::NoPen);
@@ -256,9 +273,15 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   const char *max_str = (tss_type == 0 ? "MA+" : (tss_type <= 1 ? "MAX" : "MAX2"));
   drawText(p, rc.center().x(), 118+y_ofs+max_disp_a, max_str, is_cruise_set ? 200 : 100);
   if (is_cruise_set) {
+#if 0
     float mm = maxSpeed.length() < 4 ? 1.1 : 1.0;
     configFont(p, "Open Sans", 88*max_disp_k*mm, is_cruise_set ? "Bold" : "SemiBold");
     drawText(p, rc.center().x(), 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, maxSpeed, 255);
+#else
+    float mm = ms.length() < 4 ? 1.1 : 1.0; //カンマピリオド以外の状況で4桁になってるケースをケアする。セミコロンとかあり得る
+    configFont(p, "Open Sans", 88*max_disp_k*mm, is_cruise_set ? "Bold" : "SemiBold");
+    drawText(p, rc.center().x(), 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, ms, 255);
+#endif
   } else {
     configFont(p, "Open Sans", 80*max_disp_k*1.1, "SemiBold");
     drawText(p, rc.center().x(), 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, maxSpeed, 100);
