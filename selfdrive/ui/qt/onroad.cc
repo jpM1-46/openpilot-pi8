@@ -250,10 +250,6 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
 #if 0
   p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
 #else
-  maxSpeed = QString(",103");
-  if(is_cruise_set){
-    maxSpeed = QString("53.");
-  }
   QString ms = QString(maxSpeed);
   if(ms.length() > 1){
     if(maxSpeed.mid(0,1) == ","){ //先頭カンマで加速
@@ -276,7 +272,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   configFont(p, "Open Sans", 48*max_disp_k, "Regular");
   const char *max_str = (tss_type == 0 ? "MA+" : (tss_type <= 1 ? "MAX" : "MAX2"));
   drawText(p, rc.center().x(), 118+y_ofs+max_disp_a, max_str, is_cruise_set ? 200 : 100);
-  if (true || is_cruise_set) {
+  if (is_cruise_set) {
 #if 0
     float mm = maxSpeed.length() < 4 ? 1.1 : 1.0;
     configFont(p, "Open Sans", 88*max_disp_k*mm, is_cruise_set ? "Bold" : "SemiBold");
