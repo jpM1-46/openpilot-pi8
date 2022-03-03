@@ -247,7 +247,24 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   float max_disp_k = 1.8;
   float max_disp_a = 50;
   QRect rc(bdr_s * 2, bdr_s * 1.5+y_ofs, 184*max_disp_k, 202*max_disp_k);
+#if 0
   p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
+#else
+  QString ms = QString(maxSpeed);
+  if(ms.length() > 1){
+    if(maxSpeed.mid(0,1) == ","){ //先頭カンマで加速
+      ms = maxSpeed.mid(1,maxSpeed.length()-1);
+      p.setPen(QPen(QColor(0, 0xff, 0, 200), 10)); //加速時は緑
+    } else if(maxSpeed.mid(maxSpeed.length()-1,1) == "."){ //末尾ピリオドで減速
+      ms = maxSpeed.mid(0,maxSpeed.length()-1);
+      p.setPen(QPen(QColor(0xff, 0, 0, 200), 10)); //減速時は赤
+    } else {
+      p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
+    }
+  } else {
+    p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
+  }
+#endif
   p.setBrush(QColor(0, 0, 0, 100));
   p.drawRoundedRect(rc, 20, 20);
   p.setPen(Qt::NoPen);
@@ -256,9 +273,15 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   const char *max_str = (tss_type == 0 ? "MA+" : (tss_type <= 1 ? "MAX" : "MAX2"));
   drawText(p, rc.center().x(), 118+y_ofs+max_disp_a, max_str, is_cruise_set ? 200 : 100);
   if (is_cruise_set) {
+#if 0
     float mm = maxSpeed.length() < 4 ? 1.1 : 1.0;
     configFont(p, "Open Sans", 88*max_disp_k*mm, is_cruise_set ? "Bold" : "SemiBold");
     drawText(p, rc.center().x(), 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, maxSpeed, 255);
+#else
+    float mm = ms.length() < 4 ? 1.1 : 1.0; //カンマピリオド以外の状況で4桁になってるケースをケアする。セミコロンとかあり得る
+    configFont(p, "Open Sans", 88*max_disp_k*mm, is_cruise_set ? "Bold" : "SemiBold");
+    drawText(p, rc.center().x(), 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, ms, 255);
+#endif
   } else {
     configFont(p, "Open Sans", 80*max_disp_k*1.1, "SemiBold");
     drawText(p, rc.center().x(), 212-(212-118)+(212-118)*max_disp_k+y_ofs+max_disp_a, maxSpeed, 100);
@@ -555,12 +578,15 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
   float g_xo = sz / 5;
   float g_yo = sz / 10;
 
-  QPointF glow[] = {{x + (sz * 1.35) + g_xo, y + sz + g_yo}, {x, y - g_yo}, {x - (sz * 1.35) - g_xo, y + sz + g_yo}};
+  //QPointF glow[] = {{x + (sz * 1.35) + g_xo, y + sz + g_yo}, {x, y - g_yo}, {x - (sz * 1.35) - g_xo, y + sz + g_yo}};
+  float homebase_h = 12;
+  QPointF glow[] = {{x + (sz * 1.35) + g_xo, y + sz + g_yo + homebase_h},{x + (sz * 1.35) + g_xo, y + sz + g_yo}, {x, y - g_yo}, {x - (sz * 1.35) - g_xo, y + sz + g_yo},{x - (sz * 1.35) - g_xo, y + sz + g_yo + homebase_h}};
   painter.setBrush(QColor(218, 202, 37, 255));
   painter.drawPolygon(glow, std::size(glow));
 
   // chevron
-  QPointF chevron[] = {{x + (sz * 1.25), y + sz}, {x, y}, {x - (sz * 1.25), y + sz}};
+  //QPointF chevron[] = {{x + (sz * 1.25), y + sz}, {x, y}, {x - (sz * 1.25), y + sz}};
+  QPointF chevron[] = {{x + (sz * 1.25), y + sz + homebase_h},{x + (sz * 1.25), y + sz}, {x, y}, {x - (sz * 1.25), y + sz},{x - (sz * 1.25), y + sz + homebase_h}};
   painter.setBrush(redColor(fillAlpha));
   painter.drawPolygon(chevron, std::size(chevron));
 
@@ -576,9 +602,10 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
 //    dist += QString::number(a_rel,'f',1) + "a";
     configFont(painter, "Open Sans", 44, "SemiBold");
     painter.setPen(QColor(0x0, 0x0, 0x0 , 200)); //影
-    painter.drawText(QRect(x+2, y-50+2, str_w, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
+    float lock_indicator_dx = 2; //下向きの十字照準を避ける。
+    painter.drawText(QRect(x+2+lock_indicator_dx, y-50+2, str_w, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
     painter.setPen(QColor(0xff, 0xff, 0xff));
-    painter.drawText(QRect(x, y-50, str_w, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
+    painter.drawText(QRect(x+lock_indicator_dx, y-50, str_w, 50), Qt::AlignBottom | Qt::AlignLeft, dist);
     painter.setPen(Qt::NoPen);
   }
 }
@@ -719,10 +746,10 @@ void NvgWindow::drawLockon(QPainter &painter, const cereal::ModelDataV2::LeadDat
         // ||ほかにv_relやa_relで前方の急減速を表示したり（num==0に表示してみた）
         //&& lead1.getX()[0] < 10 //lead1が自分の前10m以内
     ){
-      leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (40 - leadcar_lockon[num].lockOK) / 10;
+      leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (40 - leadcar_lockon[num].lockOK) / 5;
       //float td = 40;
     } else {
-      leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (0 - leadcar_lockon[num].lockOK) / 10;
+      leadcar_lockon[num].lockOK = leadcar_lockon[num].lockOK + (0 - leadcar_lockon[num].lockOK) / 5;
     }
     float td = leadcar_lockon[num].lockOK;
     //d:10〜100->1〜3へ変換

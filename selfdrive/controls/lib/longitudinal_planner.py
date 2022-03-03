@@ -125,6 +125,37 @@ class Planner:
         if handle_center_info_str:
           handle_center = float(handle_center_info_str)
 
+#  struct LeadData {
+#    dRel @0 :Float32;
+#    yRel @1 :Float32;
+#    vRel @2 :Float32;
+#    aRel @3 :Float32;
+#    vLead @4 :Float32;
+#    dPath @6 :Float32;
+#    vLat @7 :Float32;
+#    vLeadK @8 :Float32;
+#    aLeadK @9 :Float32;
+#    fcw @10 :Bool;
+#    status @11 :Bool;
+#    aLeadTau @12 :Float32;
+#    modelProb @13 :Float32;
+#    radar @14 :Bool;
+#
+#    aLeadDEPRECATED @5 :Float32;
+#  }
+    hasLead = sm['radarState'].leadOne.status
+    add_v_by_lead = False #前走車に追いつくための増速処理
+    if hasLead == True and sm['radarState'].leadOne.modelProb > 0.5: #前走者がいる,信頼度が高い
+      leadOne = sm['radarState'].leadOne
+      d_rel = leadOne.dRel #前走者までの距離
+      a_rel = leadOne.aRel #前走者の加速？　離れていっている時はプラス
+      if v_ego * 3.6 * 0.8 < d_rel / 0.98 and a_rel >= 0: #例、時速50kmの時前走車までの距離が50m以上離れている&&相手が減速していない。×0.8はd_relの値と実際の距離感との調整。
+        if v_ego * 3.6 >= v_cruise_kph * 0.98: #ACC設定速度がすでに出ている。
+          add_v_by_lead = True #前走車に追いつくための増速処理が有効
+          v_cruise_kph *= 1.15 #ACC設定速度を1.5割増速
+          if v_cruise_kph > 105:
+            v_cruise_kph = 105 #危ないのでひとまず時速105kmまで。
+
     steerAng = sm['carState'].steeringAngleDeg - handle_center
     orgSteerAng = steerAng
     limit_vc = V_CRUISE_MAX
@@ -141,10 +172,11 @@ class Planner:
           steerAng = (-max_yp / 2.5)
       limit_vc = V_CRUISE_MAX if abs(steerAng) <= LIMIT_VC_B else LIMIT_VC_A / (abs(steerAng) - LIMIT_VC_B) + LIMIT_VC_C
       limit_vc_h = V_CRUISE_MAX if abs(steerAng) <= LIMIT_VC_BH else LIMIT_VC_AH / (abs(steerAng) - LIMIT_VC_BH) + LIMIT_VC_CH
-      if CVS_FRAME % 10 == 0 and v_ego * 3.6 > 20: # over 20km/h
-        ml_csv = '%0.2f,' % v_cruise_kph
-        for i in path_y:
-          ml_csv += '%0.2f,' % i
+      #前方カーブ機械学習用ファイルデータ生成処理。ひとまず保留
+      #if CVS_FRAME % 10 == 0 and v_ego * 3.6 > 20: # over 20km/h
+      #  ml_csv = '%0.2f,' % v_cruise_kph
+      #  for i in path_y:
+      #    ml_csv += '%0.2f,' % i
     v_cruise_kph_org = v_cruise_kph
     limit_vc_th = 95-5 #85-5 #80-4
     limit_vc_tl = 65-4 #70-4
@@ -165,10 +197,13 @@ class Planner:
         if v_cruise_kph == limit_vc:
           fp.write('%d.' % (v_cruise_kph))
         else:
-          vo = v_cruise_kph_org
-          if int(vo) == 59 or int(vo) == 61:
-            vo += 0.5 #メーター表示誤差補正
-          fp.write('%d' % (vo))
+          if add_v_by_lead == True:
+            fp.write(',%d' % (v_cruise_kph_org))
+          else:
+            vo = v_cruise_kph_org
+            if int(vo) == 59 or int(vo) == 61:
+              vo += 0.5 #メーター表示誤差補正
+            fp.write('%d' % (vo))
     #if CVS_FRAME % 10 == 0 and limit_vc < V_CRUISE_MAX and v_ego * 3.6 > 20: # over 20km/h
     #  with open('./ml_data.csv','a') as fp:
     #    fp.write('%s%0.2f\n' % (ml_csv , limit_vc))
