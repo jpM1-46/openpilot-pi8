@@ -565,15 +565,14 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   int temp = (int)deviceState.getAmbientTempC();
   QString temp_disp = QString("Temp:") + QString::number(temp) + "°C";
   configFont(p, "Open Sans", 33, "SemiBold");
-  if(temp < 53){
+  if(temp < 48){ //警告色の変化はサイドバーと違う。もっと早く警告される。
     p.setPen(QColor(0xff, 0xff, 0xff , 200));
-  } else if(temp < 65){
+  } else if(temp < 55){
     p.setPen(QColor(0xff, 0xff, 0 , 255));
   } else {
     p.setPen(QColor(0xff, 0, 0 , 255));
   }
-    p.setPen(QColor(0xff, 0, 0 , 255));
-  p.drawText(QRect(rect().left()+60, rect().top()+210, 300, 50), Qt::AlignTop | Qt::AlignLeft, temp_disp);
+  p.drawText(QRect(rect().left()+60, rect().top()+120, 300, 50), Qt::AlignTop | Qt::AlignLeft, temp_disp);
 
   if((float)rect_w / rect_h > 1.4f){
     configFont(p, "Open Sans", 44, "SemiBold");
@@ -700,7 +699,14 @@ void OnroadHud::drawIcon(QPainter &p, int x, int y, QPixmap &img, QBrush bg, flo
   p.setBrush(bg);
   p.drawEllipse(x - radius / 2, y - radius / 2, radius, radius);
   p.setOpacity(opacity);
-  p.drawPixmap(x - img_size / 2, y - img_size / 2, img);
+  p.translate(x - img_size / 2,y - img_size / );
+  if(ang != 0){
+    p.translate(img_size/2,img_size/2);
+    p.rotate(ang * 3.14159265 / 180);
+    p.translate(-img_size/2,-img_size/2);
+  }
+  QRect r(0,0,img_size,img_size);
+  p.drawPixmap(r, img);
 }
 
 // NvgWindow
