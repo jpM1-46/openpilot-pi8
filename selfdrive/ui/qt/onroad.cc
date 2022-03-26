@@ -572,8 +572,8 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   } else {
     p.setPen(QColor(0xff, 0, 0 , 255));
   }
-    p.setPen(QColor(0xff, 0xff, 0 , 255));
-  p.drawText(QRect(rect().left()+50, rect().top()+110, 300, 50), Qt::AlignTop | Qt::AlignLeft, temp_disp);
+    p.setPen(QColor(0xff, 0, 0 , 255));
+  p.drawText(QRect(rect().left()+60, rect().top()+210, 300, 50), Qt::AlignTop | Qt::AlignLeft, temp_disp);
 
   if((float)rect_w / rect_h > 1.4f){
     configFont(p, "Open Sans", 44, "SemiBold");
@@ -628,7 +628,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   // engage-ability icon
   if (engageable) {
     drawIcon(p, rect().right() - radius / 2 - bdr_s * 2, radius / 2 + int(bdr_s * 1.5)+y_ofs,
-             engage_img, bg_colors[status], 1.0);
+             engage_img, bg_colors[status], 1.0 , angle_steer);
   }
 
   //キャリブレーション値の表示。dm iconより先にやらないと透明度が連動してしまう。
@@ -670,7 +670,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   // dm icon
   if (!hideDM) {
     drawIcon(p, radius / 2 + (bdr_s * 2), rect().bottom() - footer_h / 2,
-             dm_img, QColor(0, 0, 0, 70), dmActive ? 1.0 : 0.2);
+             dm_img, QColor(0, 0, 0, 70), dmActive ? 1.0 : 0.2 , 0);
   }
 
 }
@@ -695,7 +695,7 @@ void OnroadHud::drawText(QPainter &p, int x, int y, const QString &text, const Q
   p.drawText(real_rect.x(), real_rect.bottom(), text);
 }
 
-void OnroadHud::drawIcon(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity) {
+void OnroadHud::drawIcon(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity , float ang) {
   p.setPen(Qt::NoPen);
   p.setBrush(bg);
   p.drawEllipse(x - radius / 2, y - radius / 2, radius, radius);
