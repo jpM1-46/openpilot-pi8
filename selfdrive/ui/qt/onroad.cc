@@ -620,8 +620,8 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   }
   drawText(p, rect().center().x(), 50 + 40*0 , "extra cruise speed engagement", a0);
   drawText(p, rect().center().x(), 50 + 40*1 , "slow down corner correctly", a1);
-  drawText(p, rect().center().x(), 50 + 40*2 , "make curve inner offset", a2);
-  //drawText(p, rect().center().x(), 50 + 40*2 , QString::number(angle_steer), a2);
+  //drawText(p, rect().center().x(), 50 + 40*2 , "make curve inner offset", a2);
+  drawText(p, rect().center().x(), 50 + 40*2 , QString::number(angle_steer), a2);
   drawText(p, rect().center().x(), 50 + 40*3 , "auto brake holding", a3);
 
   // engage-ability icon
