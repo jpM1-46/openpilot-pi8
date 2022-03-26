@@ -559,6 +559,15 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
 
 
 //以下オリジナル表示要素
+  //温度を表示
+  UIState *s = uiState();
+  auto deviceState = (*s->sm)["deviceState"].getDeviceState();
+  int temp = (int)deviceState.getAmbientTempC();
+  QString temp_disp = QString("Temp:") + QString::number(temp) + "°C";
+  configFont(p, "Open Sans", 40, "SemiBold");
+  p.setPen(QColor(0xff, 0xff, 0xff , 200));
+  p.drawText(QRect(rect().left()+30, rect().top()+120, 200, 50), Qt::AlignTop | Qt::AlignLeft, temp_disp);
+
   if((float)rect_w / rect_h > 1.4f){
     configFont(p, "Open Sans", 44, "SemiBold");
     drawText(p, rect().left()+250, 55, "Powered by COMMA.AI", 150);
