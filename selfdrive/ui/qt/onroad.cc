@@ -572,7 +572,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   } else {
     p.setPen(QColor(0xff, 0, 0 , 255));
   }
-  p.drawText(QRect(rect().left()+60, rect().top()+120, 300, 50), Qt::AlignTop | Qt::AlignLeft, temp_disp);
+  p.drawText(QRect(rect().left()+65, rect().top()+120, 300, 50), Qt::AlignTop | Qt::AlignLeft, temp_disp);
 
   if((float)rect_w / rect_h > 1.4f){
     configFont(p, "Open Sans", 44, "SemiBold");
@@ -703,7 +703,7 @@ void OnroadHud::drawIcon(QPainter &p, int x, int y, QPixmap &img, QBrush bg, flo
   p.translate(x - img_size / 2,y - img_size / 2);
   if(ang != 0){
     p.translate(img_size/2,img_size/2);
-    p.rotate(ang * 3.14159265 / 180);
+    p.rotate(ang); //degree指定
     p.translate(-img_size/2,-img_size/2);
   }
   QRect r(0,0,img_size,img_size);
