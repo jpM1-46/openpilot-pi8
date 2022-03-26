@@ -559,14 +559,21 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
 
 
 //以下オリジナル表示要素
-  //温度を表示
+  //温度を表示(この画面は更新が飛び飛びになる。ハンドル回したりとか何か変化が必要)
   UIState *s = uiState();
   auto deviceState = (*s->sm)["deviceState"].getDeviceState();
   int temp = (int)deviceState.getAmbientTempC();
   QString temp_disp = QString("Temp:") + QString::number(temp) + "°C";
-  configFont(p, "Open Sans", 40, "SemiBold");
-  p.setPen(QColor(0xff, 0xff, 0xff , 200));
-  p.drawText(QRect(rect().left()+30, rect().top()+120, 200, 50), Qt::AlignTop | Qt::AlignLeft, temp_disp);
+  configFont(p, "Open Sans", 33, "SemiBold");
+  if(temp < 53){
+    p.setPen(QColor(0xff, 0xff, 0xff , 200));
+  } else if(temp < 65){
+    p.setPen(QColor(0xff, 0xff, 0 , 255));
+  } else {
+    p.setPen(QColor(0xff, 0, 0 , 255));
+  }
+    p.setPen(QColor(0xff, 0xff, 0 , 255));
+  p.drawText(QRect(rect().left()+50, rect().top()+110, 300, 50), Qt::AlignTop | Qt::AlignLeft, temp_disp);
 
   if((float)rect_w / rect_h > 1.4f){
     configFont(p, "Open Sans", 44, "SemiBold");
