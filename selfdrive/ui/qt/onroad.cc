@@ -699,7 +699,8 @@ void OnroadHud::drawIcon(QPainter &p, int x, int y, QPixmap &img, QBrush bg, flo
   p.setBrush(bg);
   p.drawEllipse(x - radius / 2, y - radius / 2, radius, radius);
   p.setOpacity(opacity);
-  p.translate(x - img_size / 2,y - img_size / );
+  p.resetTransform();
+  p.translate(x - img_size / 2,y - img_size / 2);
   if(ang != 0){
     p.translate(img_size/2,img_size/2);
     p.rotate(ang * 3.14159265 / 180);
