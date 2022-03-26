@@ -564,7 +564,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   auto deviceState = (*s->sm)["deviceState"].getDeviceState();
   int temp = (int)deviceState.getAmbientTempC();
   QString temp_disp = QString("Temp:") + QString::number(temp) + "°C";
-  configFont(p, "Open Sans", 33, "SemiBold");
+  configFont(p, "Open Sans", 44, "SemiBold");
   if(temp < 48){ //警告色の変化はサイドバーと違う。もっと早く警告される。
     p.setPen(QColor(0xff, 0xff, 0xff , 200));
   } else if(temp < 55){
@@ -572,7 +572,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   } else {
     p.setPen(QColor(0xff, 0, 0 , 255));
   }
-  p.drawText(QRect(rect().left()+65, rect().top()+120, 300, 50), Qt::AlignTop | Qt::AlignLeft, temp_disp);
+  p.drawText(QRect(rect().left()+65, rect().top()+110, 300, 50), Qt::AlignTop | Qt::AlignLeft, temp_disp);
 
   if((float)rect_w / rect_h > 1.4f){
     configFont(p, "Open Sans", 44, "SemiBold");
@@ -584,6 +584,11 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   drawText(p, rect().right()-275, rect().bottom() - 10 , "modified by PROGRAMAN ICHIRO", 150);
   configFont(p, "Open Sans", 33, "Bold");
   float angle_steer = 0;
+  float angle_steer0 = 0;
+  std::string angle_steer0_txt = util::read_file("../manager/steer_ang_info.txt");
+  if(angle_steer0_txt.empty() == false){
+    angle_steer0 = std::stof(angle_steer0_txt);
+  }
   float a0 = 150,a1 = 150,a2 = 150,a3 = 150;
   curve_value = 0;
   global_status = status;
@@ -595,10 +600,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
     if(vc_speed < 1/3.6){
       a3 = 200;
     }
-    std::string angle_steer_txt = util::read_file("../manager/steer_ang_info.txt");
-    if(angle_steer_txt.empty() == false){
-      angle_steer = std::stof(angle_steer_txt);
-    }
+    angle_steer = angle_steer0;
     if(vc_speed >= 1/3.6 && (angle_steer > 1.5 || angle_steer < -1.5)){ //低速では1.0だが、一緒くたにする
       if(uiState()->scene.mHandleCtrlButton == true){
         a2 = 200; //↔︎ボタンOFFで濃くしない。
@@ -627,7 +629,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   // engage-ability icon
   if (engageable) {
     drawIcon(p, rect().right() - radius / 2 - bdr_s * 2, radius / 2 + int(bdr_s * 1.5)+y_ofs,
-             engage_img, bg_colors[status], 1.0 , -angle_steer);
+             engage_img, bg_colors[status], 1.0 , -angle_steer0);
   }
 
   //キャリブレーション値の表示。dm iconより先にやらないと透明度が連動してしまう。
@@ -708,6 +710,7 @@ void OnroadHud::drawIcon(QPainter &p, int x, int y, QPixmap &img, QBrush bg, flo
   }
   QRect r(0,0,img_size,img_size);
   p.drawPixmap(r, img);
+  p.resetTransform();
 }
 
 // NvgWindow
