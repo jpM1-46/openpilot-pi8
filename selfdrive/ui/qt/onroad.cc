@@ -849,7 +849,7 @@ void NvgWindow::knightScanner(QPainter &p) {
   UIState *s = uiState();
   //float vc_speed = (*s->sm)["carState"].getCarState().getVEgo();
   float vc_accel = (*s->sm)["carState"].getCarState().getAEgo();
-  vc_accel = -0.5;
+  //vc_accel = -0.5;
   float hha = 0;
   if(vc_accel > 0){
     hha = 1 - 0.1 / vc_accel;
