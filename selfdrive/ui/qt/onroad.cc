@@ -848,7 +848,9 @@ void NvgWindow::knightScanner(QPainter &p) {
 #if 1 //加速減速表示テスト
   UIState *s = uiState();
   //float vc_speed = (*s->sm)["carState"].getCarState().getVEgo();
-  float vc_accel = (*s->sm)["carState"].getCarState().getAEgo();
+  float vc_accel0 = (*s->sm)["carState"].getCarState().getAEgo();
+  static float vc_accel;
+  vc_accel = vc_accel + (vc_accel0 - vc_accel) / 10;
   //vc_accel = -0.5;
   float hha = 0;
   if(vc_accel > 0){
@@ -863,7 +865,7 @@ void NvgWindow::knightScanner(QPainter &p) {
     hha = 0;
   }
   hha = hha * rect_h;
-  float wp = 40;
+  float wp = 35;
   if(vc_accel > 0){
     QRect ra = QRect(rect_w - wp , rect_h/2 - hha/2 , wp , hha/2);
     p.drawRect(ra);
