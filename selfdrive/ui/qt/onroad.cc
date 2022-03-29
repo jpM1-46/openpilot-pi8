@@ -849,7 +849,7 @@ void NvgWindow::knightScanner(QPainter &p) {
   UIState *s = uiState();
   //float vc_speed = (*s->sm)["carState"].getCarState().getVEgo();
   float vc_accel = (*s->sm)["carState"].getCarState().getAEgo();
-  vc_accel = 0.7;
+  vc_accel = -0.5;
   float hha = 0;
   if(vc_accel > 0){
     hha = 1 - 0.1 / vc_accel;
@@ -863,12 +863,12 @@ void NvgWindow::knightScanner(QPainter &p) {
     hha = 0;
   }
   hha = hha * rect_h;
-  float wp = 0.05;
+  float wp = 40;
   if(vc_accel > 0){
-    QRect ra = QRect(rect_w * (1-wp) , rect_h/2 - hha/2 , rect_w * wp , hha/2);
+    QRect ra = QRect(rect_w - wp , rect_h/2 - hha/2 , wp , hha/2);
     p.drawRect(ra);
   } else {
-    QRect ra = QRect(rect_w * (1-wp) , rect_h/2         , rect_w * wp , hha/2);
+    QRect ra = QRect(rect_w - wp , rect_h/2         , wp , hha/2);
     p.drawRect(ra);
   }
 #endif
