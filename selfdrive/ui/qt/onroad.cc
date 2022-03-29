@@ -844,6 +844,34 @@ void NvgWindow::knightScanner(QPainter &p) {
     }
     t[i] *= 0.9;
   }
+
+#if 1 //加速減速表示テスト
+  UIState *s = uiState();
+  //float vc_speed = (*s->sm)["carState"].getCarState().getVEgo();
+  float vc_accel = (*s->sm)["carState"].getCarState().getAEgo();
+  vc_accel = 0.7;
+  float hha = 0;
+  if(vc_accel > 0){
+    hha = 1 - 0.1 / vc_accel;
+    p.setBrush(QColor(0, 245, 0, 200));
+  }
+  if(vc_accel < 0){
+    hha = 1 + 0.1 / vc_accel;
+    p.setBrush(QColor(245, 0, 0, 200));
+  }
+  if(hha < 0){
+    hha = 0;
+  }
+  hha = hha * rect_h;
+  float wp = 0.05;
+  if(vc_accel > 0){
+    QRect ra = QRect(rect_w * (1-wp) , rect_h/2 - hha/2 , rect_w * wp , hha/2);
+    p.drawRect(ra);
+  } else {
+    QRect ra = QRect(rect_w * (1-wp) , rect_h/2         , rect_w * wp , hha/2);
+    p.drawRect(ra);
+  }
+#endif
   p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 }
 
