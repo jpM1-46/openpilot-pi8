@@ -119,13 +119,13 @@ def get_lag_adjusted_curvature(CP, v_ego, steerAng , psis, curvatures, curvature
   abs_sta = abs(steerAng) / 10
   if abs_sta > 1:
     abs_sta = 1 # abs_sta:0〜1
-  MAX_CURVATURE_RATES_k = 1 + (2.7 - 1) * abs_sta #1〜2.7
+  MAX_CURVATURE_RATES_k = 1.2 + (2.7 - 1) * abs_sta #1.2〜2.7+0.2
   MAX_CURVATURE_RATES = [MAX_CURVATURE_RATES_0[0]*MAX_CURVATURE_RATES_k , MAX_CURVATURE_RATES_0[1]]
   max_curvature_rate = interp(v_ego, MAX_CURVATURE_RATE_SPEEDS, MAX_CURVATURE_RATES)
   vv2 = v_ego if v_ego >= 31/3.6 else 31/3.6 #この速度(31km/h)以下はk_vが上がらないようにする
   #abs(steerAng):0〜10→1〜1.9
   max_k_v = 1.9
-  max_k_v = 1 + (max_k_v - 1) * abs_sta #max_k_v = 1〜max_k_v , ひとまずハンドル（前方カーブ予測含む）が10度で最大値になる。
+  max_k_v = 1.1 + (max_k_v - 1) * abs_sta #max_k_v = 1.1〜max_k_v+0.1 , ひとまずハンドル（前方カーブ予測含む）が10度で最大値になる。
   k_v = 1.0 if vv2 >= 75/3.6 else 1+ (1 - vv2 / (75/3.6))*(max_k_v-1) # 1〜0 -> 1〜max_k_v(75km/h以上はk_v=1)
   #with open('./debug_out_k','w') as fp:
   #  fp.write('k_v:%.2f , steerAng:%.2f' % (k_v , steerAng))
