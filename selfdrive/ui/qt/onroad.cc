@@ -875,6 +875,15 @@ void NvgWindow::knightScanner(QPainter &p) {
   }
 #endif
   p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+#if 1 //減速度と舵角を表示
+  float cv = 101;
+  float ang = -25.3;
+  QString debug_disp = QString("Slow:") + QString::number(cv,'f',0) + ",Ang:" + QString::number(ang,'f',1);
+  configFont(p, "Open Sans", 44, "SemiBold");
+  p.setPen(QColor(0xdf, 0xdf, 0x00 , 200));
+  p.drawText(QRect(0+20, rect_h - 46, 400, 46), Qt::AlignBottom | Qt::AlignLeft, debug_disp);
+#endif
 }
 
 void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV3::Reader &lead_data, const QPointF &vd , int num , size_t leads_num) {
