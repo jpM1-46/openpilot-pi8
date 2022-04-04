@@ -877,9 +877,9 @@ void NvgWindow::knightScanner(QPainter &p) {
   p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
 #if 1 //減速度と舵角を表示
-  static float cv = 101;
-  static float ang = -25.3;
-#if 0
+  static float cv = 0;
+  static float ang = 0;
+#if 1
   static unsigned int debug_ct;
   if(debug_ct % 10 == 0){
     std::string limit_vc_txt = util::read_file("../manager/limit_vc_info.txt");
