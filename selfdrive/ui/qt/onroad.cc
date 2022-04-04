@@ -786,7 +786,7 @@ void NvgWindow::knightScanner(QPainter &p) {
   //int dim_n = (sin(ct/5) + 1) * (n-0.01);
   //t[dim_n] = 1.0;
   t[(int)(ct/ct_n)] = 1.0;
-  int ww = rect_w / n-1; //画面外の一つ分を外す。
+  int ww = rect_w / (n-1); //画面外の一つ分を外す。
   int hh = ww;
 
   static float dir0 = 1.0;
@@ -903,7 +903,7 @@ void NvgWindow::knightScanner(QPainter &p) {
   }
   {
     QString debug_disp = QString(",Ang:") + QString::number(ang,'f',1);
-    p.drawText(QRect(0+20 + 200, rect_h - 46, 200, 46), Qt::AlignBottom | Qt::AlignLeft, debug_disp);
+    p.drawText(QRect(0+20 + 200, rect_h - 46, 210, 46), Qt::AlignBottom | Qt::AlignLeft, debug_disp);
   }
 #endif
 }
