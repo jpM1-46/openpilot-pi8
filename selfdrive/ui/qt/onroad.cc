@@ -877,8 +877,24 @@ void NvgWindow::knightScanner(QPainter &p) {
   p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
 #if 1 //減速度と舵角を表示
-  float cv = 101;
-  float ang = -25.3;
+  static float cv = 101;
+  static float ang = -25.3;
+#if 0
+  static unsigned int debug_ct;
+  if(debug_ct % 10 == 0){
+    std::string limit_vc_txt = util::read_file("../manager/limit_vc_info.txt");
+    if(limit_vc_txt.empty() == false){
+      cv = std::stof(limit_vc_txt);
+    }
+  }
+  if(debug_ct % 10 == 5){
+    std::string angle_steer0_txt = util::read_file("../manager/steer_ang_info.txt");
+    if(angle_steer0_txt.empty() == false){
+      ang = std::stof(angle_steer0_txt);
+    }
+  }
+  debug_ct ++;
+#endif
   QString debug_disp = QString("Slow:") + QString::number(cv,'f',0) + ",Ang:" + QString::number(ang,'f',1);
   configFont(p, "Open Sans", 44, "SemiBold");
   p.setPen(QColor(0xdf, 0xdf, 0x00 , 200));
