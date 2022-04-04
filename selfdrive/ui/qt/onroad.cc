@@ -895,10 +895,16 @@ void NvgWindow::knightScanner(QPainter &p) {
   }
   debug_ct ++;
 #endif
-  QString debug_disp = QString("Slow:") + QString::number(cv,'f',0) + ",Ang:" + QString::number(ang,'f',1);
   configFont(p, "Open Sans", 44, "SemiBold");
   p.setPen(QColor(0xdf, 0xdf, 0x00 , 200));
-  p.drawText(QRect(0+20, rect_h - 46, 400, 46), Qt::AlignBottom | Qt::AlignLeft, debug_disp);
+  {
+    QString debug_disp = QString("Slow:") + QString::number(cv,'f',0);
+    p.drawText(QRect(0+20, rect_h - 46, 200, 46), Qt::AlignBottom | Qt::AlignLeft, debug_disp);
+  }
+  {
+    QString debug_disp = QString(",Ang:") + QString::number(ang,'f',1);
+    p.drawText(QRect(0+20 + 200, rect_h - 46, 200, 46), Qt::AlignBottom | Qt::AlignLeft, debug_disp);
+  }
 #endif
 }
 
