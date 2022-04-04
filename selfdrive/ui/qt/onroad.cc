@@ -781,12 +781,12 @@ void NvgWindow::knightScanner(QPainter &p) {
   int rect_w = rect().width();
   int rect_h = rect().height();
 
-  const int n = 15;
+  const int n = 15+1; //タイミングの問題で画面外に一つ増やす
   static float t[n];
   //int dim_n = (sin(ct/5) + 1) * (n-0.01);
   //t[dim_n] = 1.0;
   t[(int)(ct/ct_n)] = 1.0;
-  int ww = rect_w / n;
+  int ww = rect_w / n-1; //画面外の一つ分を外す。
   int hh = ww;
 
   static float dir0 = 1.0;
@@ -831,7 +831,7 @@ void NvgWindow::knightScanner(QPainter &p) {
     }
   }
   p.setCompositionMode(QPainter::CompositionMode_Plus);
-  for(int i=0; i<n; i++){
+  for(int i=0; i<(n-1); i++){
     //QRect rc(0, h_pos, ww, hh);
     if(t[i] > 0.01){
       //p.drawRoundedRect(rc, 0, 0);
@@ -840,7 +840,7 @@ void NvgWindow::knightScanner(QPainter &p) {
       } else {
         p.setBrush(QColor(200, 200, 0, 255 * t[i])); //ハンドルセンターキャリブレーション中は色を緑に。
       }
-      p.drawRect(rect_w * i / n, h_pos, ww, hh);
+      p.drawRect(rect_w * i / (n-1), h_pos, ww, hh);
     }
     t[i] *= 0.9;
   }
