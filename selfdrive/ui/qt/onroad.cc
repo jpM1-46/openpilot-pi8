@@ -213,6 +213,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
   QHBoxLayout *btns_layout0  = new QHBoxLayout(btns_wrapper0);
   btns_layout0->setSpacing(0);
   btns_layout0->setContentsMargins(0, 0, 0, 30);
+  btns_wrapper0->setWindowOpacity(0.5);
   main_layout->addWidget(btns_wrapper0, 0, Qt::AlignTop | Qt::AlignRight);
 
   QWidget *btns_wrapperL = new QWidget;
@@ -222,7 +223,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
 
   btns_layout0->addWidget(btns_wrapperL,0,Qt::AlignVCenter);
 
-  const float all_opac = 0.2;
+  const float all_opac = 1.0;
   {
     // Handle Ctrl button
     uiState()->scene.mHandleCtrlButton = mHandleCtrlButton = getButtonEnabled("../manager/handle_ctrl_disable.txt");
