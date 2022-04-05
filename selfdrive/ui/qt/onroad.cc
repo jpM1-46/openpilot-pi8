@@ -232,7 +232,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
     });
     handleCtrlButton->setFixedWidth(150);
     handleCtrlButton->setFixedHeight(150);
-    handleCtrlButton->setPalette(QPalette::Background,QColor(255,255,255,all_opac*255));
+    handleCtrlButton->setPalette(QColor(255,255,255,all_opac*255));
     handleCtrlButton->setAutoFillBackground(true);
     //btns_layoutL->addSpacing(70);
     btns_layoutL->addWidget(handleCtrlButton);
