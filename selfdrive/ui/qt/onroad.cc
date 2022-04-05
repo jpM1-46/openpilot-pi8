@@ -311,7 +311,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
 
   setStyleSheet(R"(
     QPushButton {
-      color: white;
+      color: rgba(255, 255, 255, 0.85);
       text-align: center;
       padding: 0px;
       border-width: 8px;
