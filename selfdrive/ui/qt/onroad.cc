@@ -222,6 +222,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
 
   btns_layout0->addWidget(btns_wrapperL,0,Qt::AlignVCenter);
 
+  const float all_opac = 0.7;
   {
     // Handle Ctrl button
     uiState()->scene.mHandleCtrlButton = mHandleCtrlButton = getButtonEnabled("../manager/handle_ctrl_disable.txt");
@@ -231,6 +232,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
     });
     handleCtrlButton->setFixedWidth(150);
     handleCtrlButton->setFixedHeight(150);
+    handleCtrlButton->setWindowOpacity(all_opac);
     //btns_layoutL->addSpacing(70);
     btns_layoutL->addWidget(handleCtrlButton);
     handleCtrlButton->setStyleSheet(QString(btn_style).arg(mButtonColors.at(mHandleCtrlButton)));
@@ -245,6 +247,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
     });
     lockOnButton->setFixedWidth(150);
     lockOnButton->setFixedHeight(150);
+    lockOnButton->setWindowOpacity(all_opac);
     btns_layoutL->addSpacing(15);
     btns_layoutL->addWidget(lockOnButton);
     lockOnButton->setStyleSheet(QString(btn_style).arg(mButtonColors.at(mLockOnButton)));
@@ -266,6 +269,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
     });
     accelCtrlButton->setFixedWidth(150);
     accelCtrlButton->setFixedHeight(150);
+    accelCtrlButton->setWindowOpacity(all_opac);
     //btns_layout->addSpacing(10);
     btns_layout->addWidget(accelCtrlButton);
     accelCtrlButton->setStyleSheet(QString(btn_style).arg(mButtonColors.at(mAccelCtrlButton)));
@@ -280,6 +284,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
     });
     decelCtrlButton->setFixedWidth(150);
     decelCtrlButton->setFixedHeight(150);
+    decelCtrlButton->setWindowOpacity(all_opac);
     btns_layout->addSpacing(15);
     btns_layout->addWidget(decelCtrlButton);
     decelCtrlButton->setStyleSheet(QString(btn_style).arg(mButtonColors.at(mDecelCtrlButton)));
@@ -299,6 +304,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
     });
     accelEngagedButton->setFixedWidth(150);
     accelEngagedButton->setFixedHeight(150);
+    accelEngagedButton->setWindowOpacity(all_opac);
     btns_layout->addSpacing(15);
     btns_layout->addWidget(accelEngagedButton);
     accelEngagedButton->setStyleSheet(QString(btn_style).arg(mButtonColors.at(mAccelEngagedButton > 0)));
@@ -311,7 +317,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
 
   setStyleSheet(R"(
     QPushButton {
-      color: rgba(255, 255, 255, 0.85);
+      color: white;
       text-align: center;
       padding: 0px;
       border-width: 8px;
