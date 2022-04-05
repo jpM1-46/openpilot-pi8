@@ -205,7 +205,7 @@ void setButtonInt(const char*fn , int num){ //新fn="../manager/accel_engaged.tx
 }
 
 // ButtonsWindow
-const static char *btn_style = "font-size: 90px; border-radius: 0px; border-color: %1";
+const static char *btn_style = "font-size: 90px; border-radius: 20px; border-color: %1";
 ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
   QVBoxLayout *main_layout  = new QVBoxLayout(this);
 
@@ -321,7 +321,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
       color: rgba(255, 255, 255, 0.5);
       text-align: center;
       padding: 0px;
-      border-width: 8px;
+      border-width: 4px;
       border-style: solid;
       background-color: rgba(75, 75, 75, 0.3);
     }
