@@ -29,7 +29,7 @@ private:
   // int lsStatus = -1;  // always initialize style sheet and send msg
   // const QStringList lsButtonColors = {"#ff3737", "#37b868", "#044389"};
 
-  const QStringList mButtonColors = {"#80909090", "#8037b868"};
+  const QStringList mButtonColors = {"#909090", "#37b868"};
 
   // model long button
   bool mLockOnButton = true;  // triggers initialization
